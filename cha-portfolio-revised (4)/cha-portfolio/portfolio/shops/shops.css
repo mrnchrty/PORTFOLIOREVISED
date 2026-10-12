@@ -175,40 +175,69 @@
   }
 }
 
-/* --- DigiCha banner + single intro card (Shop section redesign) --- */
-.shops-banner-section {
-  padding-bottom: 0;
+/* --- One unified Shop card: heading + banner + DigiCha brand block --- */
+.shops-unified-section {
+  padding-top: 24px;
+}
+
+.shop-unified-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 960px;
+  margin-inline: auto;
+  padding: clamp(28px, 5vw, 48px);
+  text-align: center;
+}
+
+.shop-unified-card .eyebrow {
+  margin-bottom: 0;
+}
+
+.shop-unified-card .display {
+  margin: 0;
+}
+
+.shop-unified-intro {
+  max-width: 62ch;
+  margin: 0;
 }
 
 .shops-digicha-banner {
   display: block;
   width: 100%;
   height: auto; /* keeps the image's own aspect ratio */
-  border-radius: 24px;
+  margin-top: 6px;
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.75);
-  box-shadow: 0 24px 54px rgba(79, 63, 123, 0.18);
+  box-shadow: 0 20px 46px rgba(79, 63, 123, 0.18);
 }
 
-.shop-intro-wrap {
+.shop-unified-brand {
   display: flex;
-  justify-content: center;
-}
-
-.shop-intro-card {
-  max-width: 800px;
-  width: 100%;
-  text-align: center;
-}
-
-.shop-intro-card .store-directory-header {
-  justify-content: center;
-}
-
-.shop-intro-card .store-directory-copy {
+  flex-direction: column;
   align-items: center;
+  gap: 12px;
+  max-width: 640px;
 }
 
-.shop-intro-card .store-directory-copy p {
-  max-width: 56ch;
-  margin-inline: auto;
+.shop-unified-brand .store-directory-header {
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.shop-unified-brand h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3.4vw, 2.1rem);
+}
+
+.shop-unified-brand p {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .shop-unified-card {
+    gap: 14px;
+  }
 }
