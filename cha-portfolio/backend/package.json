@@ -8,7 +8,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node --test",
-    "check": "node --check server.js && node --check services/supabase.js && node --check middleware/auth.js && node --check middleware/admin.js && node --check middleware/errors.js && node --check routes/auth.js && node --check routes/shops.js && node --check routes/admin.js && node --check controllers/authController.js && node --check controllers/shopController.js && node --check controllers/adminController.js && node --check controllers/paymentController.js && node --check tests/supabase-isolation.test.js && node --check ../shared/shop-api.js && node --check ../shared/storefront.js && node --check ../admin/admin.js && node --check ../portfolio/about/script.js && node --check ../portfolio/projects/projects.js && node --check ../portfolio/mabini/mabini.js && node --check ../digicha-shop/digicha.js && node --check ../mochajaki-shop/mochajaki.js"
+    "check": "node --check server.js && node --check services/supabase.js && node --check middleware/auth.js && node --check middleware/admin.js && node --check middleware/errors.js && node --check routes/auth.js && node --check routes/shops.js && node --check routes/admin.js && node --check controllers/authController.js && node --check controllers/shopController.js && node --check controllers/adminController.js && node --check controllers/paymentController.js && node --check tests/supabase-isolation.test.js && node --check tests/storefront-account.test.js && node --check ../shared/shop-api.js && node --check ../shared/storefront.js && node --check ../admin/admin.js && node --check ../portfolio/about/script.js && node --check ../portfolio/projects/projects.js && node --check ../portfolio/mabini/mabini.js && node --check ../digicha-shop/digicha.js && node --check ../mochajaki-shop/mochajaki.js"
   },
   "engines": {
     "node": ">=18"
@@ -21,5 +21,8 @@
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
     "stripe": "^18.5.0"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.2"
   }
 }

@@ -63,7 +63,7 @@ Requirements: Node.js 18 or newer, npm, and either the shared Supabase project c
 
 **For the shared project, run `database/seed.sql` once. For a two-project setup, do not run `database/seed.sql`; use the matching per-shop seed in each project.** If a combined seed was already applied to an existing project, back up and review its data before removing anything.
 
-For Node watch mode, use `npm run dev`. Run `npm run check` in `backend/` to syntax-check the server, routes, and browser JavaScript; `npm test` runs local tests for per-shop Supabase configuration and session isolation.
+For Node watch mode, use `npm run dev`. Run `npm run check` in `backend/` to syntax-check the server, routes, and browser JavaScript; `npm test` runs local tests for per-shop Supabase configuration and session isolation, then loads both storefront pages in jsdom to verify the account header (Log In | Create Account while signed out, the account image with My Account and the profile dashboard when signed in, and the removal of owner-directed copy). The storefront checks skip themselves when `jsdom` is not installed.
 
 ## Supabase and authentication setup
 

@@ -6,13 +6,13 @@ This document distinguishes verified changes from requested work that has not be
 - `portfolio/about/index.html`, `style.css`, `script.js` and `portfolio/resume/index.html`, `style.css`, `script.js` are separate editable pages.
 - Fixed `backend/package.json`'s `npm run check` command, which incorrectly referenced the deleted `portfolio/about/about.js`. `npm run check` now exits successfully.
 
-- Storefront headers use a single account entry point (Log In | Create Account, then the account image with My Account), and owner-directed instruction text was removed from the visitor-facing shop copy. The signed-in state has **not** been exercised against a live Supabase project.
+- Storefront headers use a single account entry point (Log In | Create Account, then the account image with My Account), and owner-directed instruction text was removed from the visitor-facing shop copy. `backend/tests/storefront-account.test.js` covers both states with a stubbed session; the signed-in state has still **not** been exercised against a live Supabase project.
 
 ## Outstanding / not verified
 - The Digicha shop still contains a promo-code field, and shared storefront logic still references promo codes. The instruction to remove all promo-code functionality is **not complete**.
 - The provided project has not undergone browser interaction, accessibility, responsive, or end-to-end tests.
 - Supabase authentication, payment verification, order persistence, and secure digital downloads require configured credentials and integration tests.
-- `npm test` could not execute because required Node dependencies are not installed in this packaged workspace. Run `npm install` in `backend/` first.
+- `npm test` needs dependencies from `backend/`; after `npm install` it runs the Supabase isolation tests plus the storefront account-header checks in jsdom. The packaged workspace ships without `node_modules`.
 - Real social profile URLs, menu/prices, certifications, actual screenshots, and image ownership must be confirmed before presenting them as verified.
 - The full list of visual asset generation and photography requirements has not been validated.
 
