@@ -2,7 +2,7 @@
 
 A readable, responsive portfolio and an independently styled storefront. The portfolio uses semantic HTML, CSS, and vanilla JavaScript; the ordering API uses Node.js 18+, Express, Supabase Auth/PostgreSQL, and optional Stripe-hosted Checkout. It supports one shared Supabase project, or a project dedicated to the shop.
 
-The two front ends are organized into separate `portfolio/` and `digicha-shop/` folders. They currently share this project’s Express backend and common UI/assets; the portfolio’s shop buttons link to the sibling shop folders. The source is intentionally kept editable: HTML files are full documents from `<!doctype html>` through their footers, and CSS, browser JavaScript, server code, and SQL remain separate, unminified files.
+The two front ends are organized into separate `portfolio/` and `digicha-shop/` folders. They currently share this project’s Express backend and common UI/assets; the portfolio’s shop button links to the sibling shop folder. The source is intentionally kept editable: HTML files are full documents from `<!doctype html>` through their footers, and CSS, browser JavaScript, server code, and SQL remain separate, unminified files.
 
 ## Project contents
 
@@ -10,10 +10,10 @@ The two front ends are organized into separate `portfolio/` and `digicha-shop/` 
 - **About Me** — brief introduction, seven years in Mabini, a five-image gallery, and the supplied interests and games as text-first labels. Resume information lives on its own page, which has a **Resume** entry in the main navigation.
 - **Projects** — scrollable System Development, Graphics (Publication Materials and Certificates), and Writing galleries. Empty image slots, hover/tap descriptions, and an accessible image-preview dialog are included.
 - **Discover Mabini** — short municipality history, resorts and places to research, the requested café names, map searches, and a reminder to check current local information. The guide does not claim personal visits.
-- **Shop directory** — separate “Visit” links open the corresponding storefront in a new tab.
+- **Shop directory** — the “Visit” link opens the storefront in a new tab.
 - **DigiCha** — the storefront, with catalog search/filtering, product options, carts, server quotes, suggestions, a customer dashboard, order tracking, and configured promotions. It uses its own shop data in the shared Supabase project (or one dedicated to it), selected by the storefront URL’s shop slug.
 - **Admin** — shop-specific staff-only catalog, order-status, promotion, and settings screens. Admin sign-ins and staff permissions are checked against the selected shop’s Supabase project.
-- **Express API / SQL** — a shop-scoped database and Auth client, shop-scoped HttpOnly session cookie, server-calculated PHP totals, order snapshots, optional Stripe Checkout, shared schema, and separate per-shop starter seeds.
+- **Express API / SQL** — a shop-scoped database and Auth client, shop-scoped HttpOnly session cookie, server-calculated PHP totals, order snapshots, optional Stripe Checkout, shared schema, and a starter seed.
 
 ## Folder map
 
@@ -31,7 +31,7 @@ digicha-shop/                       DigiCha standalone storefront files
 admin/                              protected shop admin interface
 shared/                             shared storefront UI and API helpers
 assets/icons/                       technology and platform logo SVGs
-assets/images/                      blank image slots and supplied menu reference
+assets/images/                      blank image slots for About Me and Projects
 backend/                             Express API, shop auth, admin, and payment logic
 database/                            schema, the shop seed, and the schema migration
 ```
