@@ -57,6 +57,29 @@ order by table_name;
 If `shops` is 0, `seed-digicha.sql` did not complete. If `staff_members` is 0, the grant has not
 been run yet — that is the usual reason the admin panel appears empty.
 
+## Test the shop before you have a Supabase project
+
+`backend/tests/support/fake-supabase.js` is a local stand-in for Supabase. It answers the same
+PostgREST and Auth calls the API makes, over a small in-memory dataset, so the whole shop can be
+driven without any account:
+
+```bash
+cd backend
+npm run fake-db                       # terminal 1 — listens on 9100
+SUPABASE_URL=http://localhost:9100 \
+SUPABASE_ANON_KEY=demo-anon-key \
+SUPABASE_SERVICE_ROLE_KEY=demo-service-role-key \
+ALLOW_SAMPLE_ORDERS=true npm start    # terminal 2 — the real API, against the stand-in
+```
+
+Then open the storefront, sign in with `owner@example.com` and any password, add the
+`TEST-DB` products to the cart and place an order. It exercises the real catalog, sign-in, quote,
+order and dashboard code paths; the stand-in data resets when it restarts.
+
+It is a development aid, not part of the product: it is not started by `npm start`, not run by
+`npm test`, and never used in production. The dataset is checked against `schema.sql` — the two
+`is_active` flags and the eight columns `create_shop_order()` returns are all mirrored here.
+
 ## From the API side
 
 `GET /api/health` reports whether the credentials are present and which variables are missing, and
