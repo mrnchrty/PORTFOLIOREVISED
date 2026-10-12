@@ -75,7 +75,7 @@ body.portfolio-theme .eyebrow::before {
 }
 
 body.portfolio-theme .button {
-  background: linear-gradient(110deg, #bd55b7, #8a56c4 60%, #529bc8);
+  background: linear-gradient(110deg, #9a3c94, #6c39a4 60%, #357ca8);
 }
 
 body.portfolio-theme .pill {
@@ -324,7 +324,7 @@ summary:focus-visible {
   padding: 11px 19px;
   border: 1px solid transparent;
   border-radius: 999px;
-  background: linear-gradient(110deg, #ca5dc0, #8655c4 58%, #5d9ece);
+  background: linear-gradient(110deg, #a9379e, #63369c 58%, #357baf);
   color: #fff;
   font-size: 0.9rem;
   font-weight: 700;

@@ -48,7 +48,7 @@
 
 .mabini-page .button {
   border-color: transparent;
-  background: linear-gradient(110deg, #319fc9, #287ab4 65%, #4b9cc8);
+  background: linear-gradient(110deg, #257999, #1d5983 65%, #327da5);
   box-shadow: 0 9px 22px rgba(42, 119, 164, 0.2);
 }
 
@@ -238,7 +238,7 @@
 .place-filter:hover,
 .place-filter.is-active {
   transform: translateY(-1px);
-  background: linear-gradient(110deg, #bd64bb, #7b64c8 64%, #61aac2);
+  background: linear-gradient(110deg, #8f3d8d, #50389f 64%, #397e95);
   color: #fff;
 }
 
@@ -504,7 +504,7 @@
 }
 
 .mabini-page .mabini-jump-links a:hover {
-  background: linear-gradient(110deg, #319fc9, #287ab4 65%, #4b9cc8);
+  background: linear-gradient(110deg, #257999, #1d5983 65%, #327da5);
   color: #fff;
 }
 
@@ -542,7 +542,7 @@
 
 .mabini-page .place-filter:hover,
 .mabini-page .place-filter.is-active {
-  background: linear-gradient(110deg, #319fc9, #287ab4 65%, #4b9cc8);
+  background: linear-gradient(110deg, #257999, #1d5983 65%, #327da5);
   color: #fff;
 }
 
