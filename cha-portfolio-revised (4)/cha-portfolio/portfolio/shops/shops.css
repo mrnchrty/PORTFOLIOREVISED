@@ -242,3 +242,17 @@
     gap: 14px;
   }
 }
+
+/* --- DigiCha pencil brand icon on the shop card --- */
+.store-monogram-pencil,
+.store-directory-digi .store-monogram-pencil {
+  background: #121014;
+  border-color: rgba(236, 30, 150, 0.55);
+  box-shadow: 0 10px 24px rgba(236, 30, 150, 0.22);
+}
+
+.store-monogram-pencil img {
+  display: block;
+  width: 60%;
+  height: 60%;
+}

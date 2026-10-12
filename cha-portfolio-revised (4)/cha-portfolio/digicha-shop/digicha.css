@@ -519,3 +519,10 @@ body.storefront-digicha {
     gap: 12px;
   }
 }
+
+/* Pencil brand icon: black tile + pink pencil, matching the DIGICHA logo */
+.storefront-digicha .store-brand-pencil {
+  border-color: rgba(236, 30, 150, 0.55);
+  background: #121014;
+  box-shadow: 0 7px 20px rgba(225, 43, 112, 0.28);
+}
