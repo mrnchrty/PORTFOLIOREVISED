@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="Creative work">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eee2ff"/><stop offset="1" stop-color="#fffafc"/></linearGradient></defs>
+      <rect width="900" height="620" rx="36" fill="url(#g)"/>
+      <circle cx="720" cy="120" r="100" fill="#9167bd" opacity=".15"/><circle cx="150" cy="500" r="145" fill="#9167bd" opacity=".12"/>
+      <path d="M95 190 Q190 95 285 190 T475 190" fill="none" stroke="#9167bd" stroke-width="5" opacity=".45"/>
+      <rect x="245" y="205" width="410" height="235" rx="18" fill="#fff" opacity=".78" transform="rotate(-6 450 320)"/>
+      <circle cx="360" cy="285" r="36" fill="#9167bd" opacity=".72"/>
+      <path d="M315 390 L420 315 L490 365 L555 285 L640 390Z" fill="#9167bd" opacity=".55"/>
+      <text x="450" y="515" text-anchor="middle" font-family="Arial,sans-serif" font-size="27" fill="#554650" font-weight="700">Creative portfolio</text>
+    </svg>

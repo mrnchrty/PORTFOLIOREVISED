@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-label="Discover Mabini">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d9f1f0"/><stop offset="1" stop-color="#fffafc"/></linearGradient></defs>
+      <rect width="900" height="620" rx="36" fill="url(#g)"/>
+      <circle cx="720" cy="120" r="100" fill="#3d9695" opacity=".15"/><circle cx="150" cy="500" r="145" fill="#3d9695" opacity=".12"/>
+      <path d="M95 190 Q190 95 285 190 T475 190" fill="none" stroke="#3d9695" stroke-width="5" opacity=".45"/>
+      <path d="M0 430 Q130 340 260 430 T520 430 T780 430 T1040 430 V620 H0Z" fill="#3d9695" opacity=".55"/>
+      <path d="M0 500 Q150 420 300 500 T600 500 T900 500 V620 H0Z" fill="#2d7779" opacity=".35"/>
+      <circle cx="690" cy="180" r="54" fill="#f7c969" opacity=".8"/>
+      <text x="450" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" fill="#3d9695" font-weight="700">Mabini, Batangas</text>
+      <text x="450" y="365" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#554650">coastlines, communities, and places to discover</text>
+    </svg>
