@@ -1,7 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="13 9 42 42" role="img" aria-label="DigiCha pencil mark">
-  <!-- DigiCha brand pencil, from the DIGICHA Creative Solutions logo -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="DigiCha pencil mark">
+  <!-- DigiCha brand icon: pink outline box with the pink pencil inside, from the DIGICHA Creative Solutions logo -->
+  <rect x="4" y="4" width="56" height="56" rx="13" fill="none" stroke="#EC1E96" stroke-width="7"/>
   <g fill="#EC1E96">
-    <path d="M38.2 17.6 46.4 25.8 27.9 44.3 18.4 47.2c-1.2.37-2.33-.76-1.96-1.96l2.9-9.5z"/>
-    <path d="M41.1 14.7l2.9-2.9c1.56-1.56 4.1-1.56 5.66 0l2.54 2.54c1.56 1.56 1.56 4.1 0 5.66l-2.9 2.9z"/>
+    <path d="M37.6 19.4 44.6 26.4 29.2 41.8 20.9 44.4c-1.15.36-2.23-.72-1.87-1.87l2.6-8.3z"/>
+    <path d="M40.1 16.9l2.4-2.4c1.5-1.5 3.93-1.5 5.43 0l1.57 1.57c1.5 1.5 1.5 3.93 0 5.43l-2.4 2.4z"/>
   </g>
 </svg>

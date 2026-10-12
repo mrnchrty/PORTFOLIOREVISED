@@ -253,6 +253,6 @@
 
 .shop-brand-pencil {
   display: block;
-  width: 36px;
-  height: 36px;
+  width: 1em; /* scales with the DigiCha title size */
+  height: 1em;
 }
