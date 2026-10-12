@@ -80,6 +80,17 @@ promotion (10% off the order), so the deals section and the promo-code field can
 the stand-in's quote and order calls mirror `quote_shop_cart`'s discount rules. It exercises the real catalog, sign-in, quote,
 order and dashboard code paths; the stand-in data resets when it restarts.
 
+The same loop also runs headlessly with one command — no terminals to juggle:
+
+```bash
+cd backend && npm run test:integration
+```
+
+It boots both processes itself and walks 14 checks over HTTP: health, the catalog and deals
+coming from the database, the 404/403 guards, sign-in with session cookies, a quote that applies
+`LAUNCH10` (₱500 → ₱450), an order saved with the discount, the dashboard reading it back, the
+admin gate, and an admin order-status write. Exit code 0 means all passed.
+
 It is a development aid, not part of the product: it is not started by `npm start`, not run by
 `npm test`, and never used in production. The dataset is checked against `schema.sql` — the two
 `is_active` flags and the eight columns `create_shop_order()` returns are all mirrored here.
