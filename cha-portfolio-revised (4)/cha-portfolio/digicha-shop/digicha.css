@@ -61,6 +61,62 @@ body.storefront-digicha {
   color: #fff;
 }
 
+.storefront-digicha .store-auth-link {
+  color: rgba(255, 245, 248, 0.88);
+}
+
+.storefront-digicha .store-auth-link:hover,
+.storefront-digicha .store-auth-link:focus-visible {
+  color: #ff9fc2;
+}
+
+.storefront-digicha .store-auth-divider {
+  color: rgba(255, 245, 248, 0.45);
+}
+
+.storefront-digicha .store-auth-link-strong {
+  border-color: rgba(255, 139, 179, 0.38);
+  background: rgba(237, 57, 127, 0.16);
+  color: #ffd3e3;
+  box-shadow: none;
+}
+
+.storefront-digicha .store-auth-link-strong:hover,
+.storefront-digicha .store-auth-link-strong:focus-visible {
+  background: rgba(237, 57, 127, 0.3);
+  text-decoration: none;
+  color: #fff;
+}
+
+.storefront-digicha .store-account-toggle {
+  border-color: rgba(255, 139, 179, 0.38);
+  background: rgba(42, 23, 31, 0.9);
+  color: #ffd3e3;
+  box-shadow: none;
+}
+
+.storefront-digicha .store-account-dropdown {
+  border-color: rgba(255, 139, 179, 0.3);
+  background: rgba(32, 20, 26, 0.97);
+}
+
+.storefront-digicha .store-account-dropdown a,
+.storefront-digicha .store-account-dropdown button {
+  color: rgba(255, 245, 248, 0.88);
+}
+
+.storefront-digicha .store-account-dropdown a:hover,
+.storefront-digicha .store-account-dropdown a:focus-visible,
+.storefront-digicha .store-account-dropdown button:hover,
+.storefront-digicha .store-account-dropdown button:focus-visible {
+  background: rgba(237, 57, 127, 0.2);
+}
+
+.storefront-digicha .store-account-dropdown button {
+  border-top-color: rgba(255, 139, 179, 0.25);
+  color: #ff9fc2;
+}
+
 .storefront-digicha .store-menu-toggle {
   border-color: rgba(255, 139, 179, 0.38);
   background: #2a171f;
