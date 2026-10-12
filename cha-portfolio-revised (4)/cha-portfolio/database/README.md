@@ -72,7 +72,9 @@ SUPABASE_SERVICE_ROLE_KEY=demo-service-role-key \
 ALLOW_SAMPLE_ORDERS=true npm start    # terminal 2 — the real API, against the stand-in
 ```
 
-Then open the storefront, sign in with `owner@example.com` and any password, add the
+Then open the storefront and sign in with `owner@example.com` and any password (registering
+through the form also works — the stand-in behaves like a project with email autoconfirm on,
+though it keeps a single canonical account). Add the
 `TEST-DB` products to the cart and place an order. The dataset also seeds the `LAUNCH10`
 promotion (10% off the order), so the deals section and the promo-code field can be exercised;
 the stand-in's quote and order calls mirror `quote_shop_cart`'s discount rules. It exercises the real catalog, sign-in, quote,

@@ -361,7 +361,12 @@ const server = http.createServer(async (request, response) => {
 
   if (request.method === 'POST' && url.pathname === '/auth/v1/signup') {
     const body = await readBody(request);
-    return send(response, 200, { ...user, email: body.email || USER_EMAIL });
+    // Like a project with email autoconfirm switched on: the signup answers with a session.
+    const created = { ...user, email: body.email || USER_EMAIL, user_metadata: body.data || user.user_metadata };
+    return send(response, 200, {
+      access_token: 'fake-access-token', token_type: 'bearer', expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_token: 'fake-refresh-token', user: created,
+    });
   }
 
   if (request.method === 'POST' && url.pathname === '/auth/v1/logout') return send(response, 204, null);
@@ -399,11 +404,25 @@ const server = http.createServer(async (request, response) => {
     if (request.method === 'POST') {
       const body = await readBody(request);
       const incoming = Array.isArray(body) ? body : [body];
+      const conflictKey = url.searchParams.get('on_conflict') || 'id';
+      const stored = [];
       for (const row of incoming) {
-        if (!row.id) row.id = randomUUID();
-        table.push(row);
+        const existing = row[conflictKey] !== undefined
+          ? table.find((r) => String(r[conflictKey]) === String(row[conflictKey]))
+          : null;
+        if (existing) {
+          Object.assign(existing, row, { updated_at: iso() });
+          stored.push(existing);
+        } else {
+          if (!row.id) row.id = randomUUID();
+          if (!row.created_at) row.created_at = iso();
+          row.updated_at = iso();
+          table.push(row);
+          stored.push(row);
+        }
       }
-      return send(response, 201, wantsObject(request) ? incoming[0] : []);
+      const represented = project(stored.map((row) => ({ ...row })), select);
+      return send(response, 201, wantsObject(request) ? represented[0] : represented);
     }
 
     if (request.method === 'PATCH') {
