@@ -4,10 +4,6 @@
 
 .shop-directory-grid {
   align-items: stretch;
-  /* one storefront now, so keep the card at a comfortable reading width and centre it
-     instead of leaving an empty second column */
-  grid-template-columns: minmax(0, 620px);
-  justify-content: center;
 }
 
 .store-directory-card {
@@ -71,7 +67,6 @@
   background: linear-gradient(145deg, #ebddff, #d8e8ff);
   color: #6e4cbd;
 }
-
 
 .store-banner {
   width: 100%;
@@ -137,7 +132,6 @@
 .store-directory-digi .store-visit-button {
   background: linear-gradient(110deg, #6644c3, #3977c4);
 }
-
 
 .directory-note-section {
   padding-top: 2px;

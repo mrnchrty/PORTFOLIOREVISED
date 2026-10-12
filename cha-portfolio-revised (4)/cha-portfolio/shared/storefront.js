@@ -1016,16 +1016,17 @@
 
     function supabaseSetupSummary() {
       const shopName = setup.shopName || shop;
-      const seedFile = 'seed-digicha.sql';
+      const seedFile = `seed-${shop}.sql`;
       return `Configure ${shopName} in backend/.env with the shared SUPABASE_* variables or its shop-specific variables, then run database/schema.sql and the matching ${seedFile} seed in the selected project.`;
     }
 
     function updateCheckoutNotice() {
       if (!elements.checkoutSetupNotice) return;
+      const shopName = setup.shopName || shop;
       let message;
       let kind = '';
       if (!sourceConnected && elements.memberStoreContent && !currentUser) {
-        message = `Create an account or sign in to see the catalog. ${supabaseSetupSummary()} No payment is collected in this preview.`;
+        message = `Create an account or sign in to see the ${shopName} catalog. ${supabaseSetupSummary()} No payment is collected in this preview.`;
       } else if (!sourceConnected) {
         const visibility = elements.memberStoreContent ? 'shown after sign-in' : 'visible';
         message = `Preview only: local sample listings are ${visibility}. ${supabaseSetupSummary()} Accounts and order submission remain unavailable until setup. No payment is collected in this preview.`;
@@ -1051,6 +1052,7 @@
     }
 
     function updateCatalogStatus() {
+      const shopName = setup.shopName || shop;
       const accountRequired = Boolean(elements.memberStoreContent) && !currentUser;
       if (elements.modeLabel) {
         elements.modeLabel.textContent = accountRequired
@@ -1059,7 +1061,7 @@
       }
       if (elements.backendStatus) {
         elements.backendStatus.textContent = accountRequired
-          ? 'Sign in or create an account to access featured items and the catalog.'
+          ? `Sign in or create a ${shopName} account to access featured offers and the catalog.`
           : (!sourceConnected
             ? `Preview only: local sample listings are shown. ${supabaseSetupSummary()}`
             : (shopInfo.is_demo
