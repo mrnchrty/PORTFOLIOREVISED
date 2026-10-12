@@ -174,3 +174,41 @@
     padding: 18px 8px 10px;
   }
 }
+
+/* --- DigiCha banner + single intro card (Shop section redesign) --- */
+.shops-banner-section {
+  padding-bottom: 0;
+}
+
+.shops-digicha-banner {
+  display: block;
+  width: 100%;
+  height: auto; /* keeps the image's own aspect ratio */
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 24px 54px rgba(79, 63, 123, 0.18);
+}
+
+.shop-intro-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.shop-intro-card {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+}
+
+.shop-intro-card .store-directory-header {
+  justify-content: center;
+}
+
+.shop-intro-card .store-directory-copy {
+  align-items: center;
+}
+
+.shop-intro-card .store-directory-copy p {
+  max-width: 56ch;
+  margin-inline: auto;
+}

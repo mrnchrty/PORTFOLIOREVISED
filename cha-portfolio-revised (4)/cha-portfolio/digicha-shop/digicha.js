@@ -1,34 +1,32 @@
 (() => {
   const paymentPreviewChoices = [
     {
+      id: 'cash_pickup',
+      label: 'Cash on Pickup',
+      instructions: 'Pay in cash when you pick up your order.',
+      type: 'manual',
+    },
+    {
+      id: 'cod',
+      label: 'Cash on Delivery',
+      instructions: 'Pay the rider in cash when your order arrives. Available within the delivery area.',
+      type: 'manual',
+    },
+    {
       id: 'gcash',
-      label: 'GCash',
-      instructions: 'Preview only. The shop must add verified GCash instructions before accepting payment.',
-      type: 'manual',
-    },
-    {
-      id: 'maya',
-      label: 'Maya',
-      instructions: 'Preview only. The shop must add verified Maya instructions before accepting payment.',
-      type: 'manual',
-    },
-    {
-      id: 'other',
-      label: 'Other',
-      instructions: 'Preview only. Confirm any other payment arrangement with the shop.',
+      label: 'GCash (manual)',
+      instructions: 'Preview only. The shop must add its verified GCash number before accepting payment. Orders stay Pending Payment until the shop verifies the proof.',
       type: 'manual',
     },
   ];
 
   const image = '../assets/images/product-placeholder.svg';
-  const sampleDescription = 'Sample product idea with a suggested PHP price. Confirm final size, material, artwork, and price before accepting real orders.';
+  const productImage = (file) => `../assets/images/products/${file}`;
   const categories = [
-    { id: 'stickers', name: 'Stickers', slug: 'stickers' },
     { id: 'mugs', name: 'Mugs', slug: 'mugs' },
-    { id: 'keychains', name: 'Keychains', slug: 'keychains' },
-    { id: 'tarpulins', name: 'Tarpaulins', slug: 'tarpulins' },
-    { id: 'certificates', name: 'Certificates', slug: 'certificates' },
-    { id: 'personalized-gifts', name: 'Personalized Gifts', slug: 'personalized-gifts' },
+    { id: 'notebooks', name: 'Notebooks', slug: 'notebooks' },
+    { id: 'stickers', name: 'Stickers', slug: 'stickers' },
+    { id: 'invitation-cards', name: 'Invitation Cards', slug: 'invitation-cards' },
   ];
 
   const optionGroup = (id, label, values) => [{
@@ -47,96 +45,93 @@
   }];
 
   const products = [
+    // ============================================================ Mugs
+    {
+      id: 'digicha-mug-blush-blooms', category_id: 'mugs', category_name: 'Mugs',
+      name: 'Blush Blooms Ceramic Mug', price: 249, sale_price: 199, stock: 25, featured: true,
+      description: 'Ready-made 11oz glossy ceramic mug with a watercolor peony and lavender wrap. Dishwasher and microwave safe.',
+      image: 'mug-blush-blooms.jpg',
+    },
+    {
+      id: 'digicha-mug-name-script', category_id: 'mugs', category_name: 'Mugs',
+      name: 'Personalized Name Mug', price: 299,
+      description: 'White 11oz ceramic mug printed with the name of your choice in rose-gold script. Tell us the name and pick a lettering style.',
+      image: 'mug-name-script.jpg',
+      options: optionGroup('lettering', 'Lettering style', [['script', 'Elegant script', 0, 299], ['serif', 'Classic serif', 0, 299]]),
+      customization: {
+        text_fields: [{ id: 'name', label: 'Name to print', max_length: 20, required: true, fee: 0 }],
+        allow_instructions: true,
+      },
+    },
+    {
+      id: 'digicha-mug-photo-print', category_id: 'mugs', category_name: 'Mugs',
+      name: 'Custom Photo Mug', price: 349,
+      description: 'Your photo, printed to keep. Upload a clear PNG or JPG and we will fit it to an 11oz cream mug.',
+      image: 'mug-photo-print.jpg',
+      customization: {
+        allow_image_upload: true, image_fee: 0, allow_instructions: true,
+        text_fields: [{ id: 'caption', label: 'Optional caption', max_length: 40, required: false, fee: 25 }],
+      },
+    },
+
+    // ======================================================== Notebooks
+    {
+      id: 'digicha-notebook-lavender-fields', category_id: 'notebooks', category_name: 'Notebooks',
+      name: 'Lavender Fields Hardbound Notebook', price: 289, stock: 18,
+      description: 'Ready-made A5 hardcover journal with a lavender-field watercolor cover, gold foil spine, and 120gsm cream pages.',
+      image: 'notebook-lavender-fields.jpg',
+    },
+    {
+      id: 'digicha-notebook-name-cover', category_id: 'notebooks', category_name: 'Notebooks',
+      name: 'Personalized Linen Notebook', price: 349,
+      description: 'Blush linen hardcover embossed with a name in gold. A keepsake for journaling, notes, or gifting.',
+      image: 'notebook-name-cover.jpg',
+      options: optionGroup('pages', 'Page style', [['lined', 'Lined', 0, 349], ['dotted', 'Dotted', 0, 349], ['blank', 'Blank', 0, 349]]),
+      customization: {
+        text_fields: [{ id: 'name', label: 'Name to emboss', max_length: 18, required: true, fee: 25 }],
+        allow_instructions: true,
+      },
+    },
+    {
+      id: 'digicha-notebook-spiral-custom', category_id: 'notebooks', category_name: 'Notebooks',
+      name: 'Custom Cover Spiral Notebook', price: 229,
+      description: 'Rose-gold spiral notebook with a cover designed from your artwork or photo. Upload a reference and describe your idea.',
+      image: 'notebook-spiral-custom.jpg',
+      customization: { allow_image_upload: true, image_fee: 50, allow_instructions: true },
+    },
+
+    // ========================================================= Stickers
+    {
+      id: 'digicha-sticker-planner-pack', category_id: 'stickers', category_name: 'Stickers',
+      name: 'Pastel Planner Sticker Pack', price: 129, sale_price: 99, stock: 40, featured: true,
+      description: 'Three ready-made sheets of pastel planner icons - hearts, tabs, labels, and washi strips. Matte, repositionable.',
+      image: 'sticker-planner-pack.jpg',
+    },
+    {
+      id: 'digicha-sticker-deco-pack', category_id: 'stickers', category_name: 'Stickers',
+      name: 'Deco Sticker Mix', price: 149, stock: 32,
+      description: 'Glossy die-cut butterflies, bows, rainbows, and blooms for laptops, bottles, and journals. Waterproof vinyl.',
+      image: 'sticker-deco-pack.jpg',
+    },
     {
       id: 'digicha-sticker-name-sheet', category_id: 'stickers', category_name: 'Stickers',
-      name: 'Custom Name Sticker Sheet', price: 80,
-      options: optionGroup('size', 'Sheet size', [['small', 'Mini sheet', 0, 80], ['standard', 'Standard sheet', 40, 120]]),
+      name: 'Custom Name Sticker Sheet', price: 120,
+      description: 'A sheet of name labels in cute script with daisy accents - perfect for school supplies and gifts. Tell us the name.',
+      image: 'sticker-name-sheet.jpg',
+      options: optionGroup('size', 'Sheet size', [['mini', 'Mini sheet', 0, 120], ['standard', 'Standard sheet', 40, 160]]),
+      customization: {
+        text_fields: [{ id: 'name', label: 'Name on the stickers', max_length: 15, required: true, fee: 0 }],
+        allow_instructions: true,
+      },
     },
-    {
-      id: 'digicha-sticker-die-cut-pack', category_id: 'stickers', category_name: 'Stickers',
-      name: 'Die-Cut Sticker Pack', price: 120,
-      options: optionGroup('finish', 'Finish', [['matte', 'Matte', 0, 120], ['glossy', 'Glossy', 20, 140]]),
-    },
-    {
-      id: 'digicha-sticker-photo-sheet', category_id: 'stickers', category_name: 'Stickers',
-      name: 'Photo Sticker Sheet', price: 100,
-      options: optionGroup('finish', 'Finish', [['matte', 'Matte', 0, 100], ['glossy', 'Glossy', 20, 120]]),
-    },
-    {
-      id: 'digicha-mug-name', category_id: 'mugs', category_name: 'Mugs',
-      name: 'Personalized Name Mug', price: 220,
-      options: optionGroup('capacity', 'Mug size', [['11oz', '11 oz', 0, 220], ['15oz', '15 oz', 50, 270]]),
-    },
-    {
-      id: 'digicha-mug-photo-wrap', category_id: 'mugs', category_name: 'Mugs',
-      name: 'Photo Print Mug', price: 250,
-      options: optionGroup('print', 'Print style', [['one-side', 'One-sided print', 0, 250], ['wrap', 'Full wrap print', 40, 290]]),
-    },
-    {
-      id: 'digicha-mug-quote', category_id: 'mugs', category_name: 'Mugs',
-      name: 'Custom Quote Mug', price: 220,
-      options: optionGroup('mug-style', 'Mug style', [['classic', 'Classic white', 0, 220], ['accent', 'Color-accent handle', 30, 250]]),
-    },
-    {
-      id: 'digicha-keychain-name', category_id: 'keychains', category_name: 'Keychains',
-      name: 'Acrylic Name Keychain', price: 100,
-      options: optionGroup('finish', 'Finish', [['clear', 'Clear acrylic', 0, 100], ['glitter', 'Glitter acrylic', 25, 125]]),
-    },
-    {
-      id: 'digicha-keychain-photo', category_id: 'keychains', category_name: 'Keychains',
-      name: 'Photo Keychain', price: 120,
-      options: optionGroup('print', 'Print sides', [['single', 'Single-sided', 0, 120], ['double', 'Double-sided', 25, 145]]),
-    },
-    {
-      id: 'digicha-keychain-initial', category_id: 'keychains', category_name: 'Keychains',
-      name: 'Custom Initial Charm', price: 90,
-      options: optionGroup('finish', 'Finish', [['clear', 'Clear acrylic', 0, 90], ['color', 'Color-accent acrylic', 20, 110]]),
-    },
-    {
-      id: 'digicha-tarpulin-birthday', category_id: 'tarpulins', category_name: 'Tarpaulins',
-      name: 'Birthday Tarpaulin · 2 × 3 ft', price: 350,
-      options: optionGroup('layout', 'Layout', [['photo-text', 'Photo and text', 0, 350], ['text-only', 'Text-led layout', 0, 350]]),
-    },
-    {
-      id: 'digicha-tarpulin-celebration', category_id: 'tarpulins', category_name: 'Tarpaulins',
-      name: 'Celebration Tarpaulin · 3 × 4 ft', price: 550,
-      options: optionGroup('layout', 'Layout', [['photo-text', 'Photo and text', 0, 550], ['text-only', 'Text-led layout', 0, 550]]),
-    },
-    {
-      id: 'digicha-tarpulin-event', category_id: 'tarpulins', category_name: 'Tarpaulins',
-      name: 'Event Tarpaulin · 4 × 6 ft', price: 850,
-      options: optionGroup('layout', 'Layout', [['photo-text', 'Photo and text', 0, 850], ['text-only', 'Text-led layout', 0, 850]]),
-    },
-    {
-      id: 'digicha-certificate-appreciation', category_id: 'certificates', category_name: 'Certificates',
-      name: 'Appreciation Certificate Print', price: 50,
-      options: optionGroup('paper', 'Paper finish', [['standard', 'Standard print', 0, 50], ['laminated', 'Laminated', 20, 70]]),
-    },
-    {
-      id: 'digicha-certificate-recognition', category_id: 'certificates', category_name: 'Certificates',
-      name: 'Recognition Certificate Print', price: 55,
-      options: optionGroup('paper', 'Paper finish', [['standard', 'Standard print', 0, 55], ['laminated', 'Laminated', 20, 75]]),
-    },
-    {
-      id: 'digicha-certificate-completion', category_id: 'certificates', category_name: 'Certificates',
-      name: 'Completion Certificate Print', price: 55,
-      options: optionGroup('paper', 'Paper finish', [['standard', 'Standard print', 0, 55], ['laminated', 'Laminated', 20, 75]]),
-    },
-    {
-      id: 'digicha-personalized-notebook', category_id: 'personalized-gifts', category_name: 'Personalized Gifts',
-      name: 'Personalized Notebook', price: 150,
-      options: optionGroup('cover', 'Cover', [['soft', 'Soft cover', 0, 150], ['hard', 'Hard cover', 50, 200]]),
-    },
-    {
-      id: 'digicha-personalized-pen-mug-set', category_id: 'personalized-gifts', category_name: 'Personalized Gifts',
-      name: 'Personalized Pen & Mug Set', price: 300,
-      options: optionGroup('set-style', 'Set style', [['classic', 'Classic set', 0, 300], ['gift-box', 'Gift-box presentation', 60, 360]]),
-    },
+
+    // Invitation Cards samples (birthday, wedding, graduation) arrive with
+    // their local product photos in the next catalog update.
   ].map((product, index) => ({
     ...product,
-    description: sampleDescription,
+    description: product.description || 'Product details will be added by the shop owner.',
     available: true,
-    image_url: image,
+    image_url: product.image ? productImage(product.image) : image,
     is_sample: true,
     is_featured: Boolean(product.featured),
     display_order: index + 1,

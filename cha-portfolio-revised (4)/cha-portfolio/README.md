@@ -52,7 +52,7 @@ Requirements: Node.js 18 or newer, npm, and a Supabase project configured for th
 4. In the Supabase project's SQL Editor:
    - For a new project, run `database/schema.sql`.
    - If this is an existing project created with the older schema in this package, back up the database, run `database/migrations/001_upgrade_existing_shop_schema.sql`, then run `database/schema.sql`.
-   - Then run `database/seed-digicha.sql` to load the starter catalog.
+   - Then run `database/rls_policies.sql`, then `database/seed.sql` to load the starter catalog.
 5. Start Express from the `backend` folder:
 
    ```bash
@@ -61,7 +61,7 @@ Requirements: Node.js 18 or newer, npm, and a Supabase project configured for th
 
 6. Open `http://localhost:3000`. Check `http://localhost:3000/api/health` for the shop configuration flags and `supabaseMissingSettings` variable-name lists. The health response never returns key values. A configured flag only means the URL/keys are present; it does not prove SQL, Auth, or payment setup is complete. The server loads `backend/.env` relative to `backend/server.js`, even if launched from another working directory.
 
-**Run `database/schema.sql` once, then `database/seed-digicha.sql`.** The seed keeps the shop in demo mode, so sample products cannot be placed as live orders by default.
+**Run `database/schema.sql` once, then `database/rls_policies.sql`, then `database/seed.sql`.** The seed keeps the shop in demo mode, so sample products cannot be placed as live orders by default.
 
 For Node watch mode, use `npm run dev`. Run `npm run check` in `backend/` to syntax-check the server, routes, and browser JavaScript; `npm test` runs local tests for the shop’s Supabase configuration and session cookies.
 

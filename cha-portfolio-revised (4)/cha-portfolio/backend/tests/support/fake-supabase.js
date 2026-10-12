@@ -31,7 +31,7 @@ const USER_EMAIL = 'owner@example.com';
 
 const iso = () => new Date().toISOString();
 
-// Product option groups use the same shape as database/seed-digicha.sql.
+// Product option groups use the same shape as database/seed.sql.
 const PRODUCTS = [
   {
     id: 'aaaaaaa1-0000-4000-8000-000000000001',

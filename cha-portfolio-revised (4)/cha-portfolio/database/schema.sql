@@ -66,6 +66,14 @@ create table if not exists public.products (
   is_featured boolean not null default false,
   options jsonb not null default '[]'::jsonb
     check (jsonb_typeof(options) = 'array'),
+  -- stock: null means made-to-order (no stock tracking); 0 means out of stock
+  stock integer check (stock is null or stock >= 0),
+  -- sale_price: when set and lower than price, the storefront shows the discount
+  sale_price numeric(12, 2) check (sale_price is null or sale_price >= 0),
+  -- customization: optional personalization config the storefront renders, e.g.
+  -- {"text_fields":[{"id":"name","label":"Name to print","max_length":30,"fee":25}],
+  --  "allow_image_upload":true,"image_fee":50,"allow_instructions":true}
+  customization jsonb,
   display_order integer not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -124,7 +132,12 @@ create table if not exists public.orders (
   customer_contact text not null default '',
   fulfillment_method text not null,
   fulfillment_details text not null default '',
+  delivery_address text not null default '',
+  delivery_instructions text not null default '',
   payment_method text not null,
+  payment_proof_path text,
+  courier_name text not null default '',
+  tracking_number text not null default '',
   promo_code text not null default '',
   subtotal numeric(12, 2) not null check (subtotal >= 0),
   discount numeric(12, 2) not null default 0 check (discount >= 0),
@@ -391,8 +404,13 @@ begin
       raise exception 'Item quantity must be between 1 and 99';
     end if;
 
-    select p.id, p.shop_id, p.name, p.price, p.category_id, p.available,
-           p.is_sample, p.options
+    select p.id, p.shop_id, p.name,
+           -- charge the sale price when one is set and lower than the list price
+           case
+             when p.sale_price is not null and p.sale_price < p.price then p.sale_price
+             else p.price
+           end as price,
+           p.category_id, p.available, p.is_sample, p.options, p.stock
     into v_product
     from public.products p
     where p.id = v_product_id;
@@ -402,6 +420,9 @@ begin
     end if;
     if not v_product.available then
       raise exception 'Product % is unavailable', v_product.name;
+    end if;
+    if v_product.stock is not null and v_product.stock < v_quantity then
+      raise exception 'Not enough stock for %: only % left', v_product.name, v_product.stock;
     end if;
     if v_product.is_sample and not p_allow_sample then
       raise exception 'Sample catalog items cannot be ordered in this environment';
@@ -740,9 +761,23 @@ begin
     where p.id = v_product_id and p.shop_id = p_shop_id;
 
     v_option_delta := public.product_option_delta(v_product.options, v_options);
-    v_unit_price := v_product.price + v_option_delta;
+    v_unit_price := case
+      when v_product.sale_price is not null and v_product.sale_price < v_product.price
+        then v_product.sale_price
+      else v_product.price
+    end + v_option_delta;
     if v_unit_price < 0 then
       raise exception 'The selected options create an invalid price';
+    end if;
+
+    -- enforce and decrement tracked stock atomically
+    if v_product.stock is not null then
+      update public.products p
+      set stock = p.stock - v_quantity
+      where p.id = v_product.id and p.stock >= v_quantity;
+      if not found then
+        raise exception 'Not enough stock for %', v_product.name;
+      end if;
     end if;
 
     insert into public.order_items (
@@ -771,6 +806,10 @@ begin
     values (v_quote.applied_promotion_id, p_customer_id, v_order_id);
   end if;
 
+  -- first entry of the tracking timeline
+  insert into public.order_events (order_id, status, note)
+  values (v_order_id, 'pending', 'Order placed');
+
   return query
   select
     o.id,
@@ -786,6 +825,130 @@ begin
 end;
 $$;
 
+-- ---------------------------------------------------------------------------
+-- E-commerce expansion: images, carts, customization, messaging, notifications,
+-- reviews, and order tracking events.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.product_images (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id) on delete cascade,
+  path text not null,
+  alt text not null default '',
+  sort_order integer not null default 0,
+  is_primary boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists product_images_product_idx
+  on public.product_images (product_id, sort_order);
+
+-- One saved cart per customer per shop; items keep their customization so two
+-- differently personalized copies of the same product stay separate lines.
+create table if not exists public.carts (
+  id uuid primary key default gen_random_uuid(),
+  shop_id uuid not null references public.shops(id) on delete cascade,
+  customer_id uuid not null references auth.users(id) on delete cascade,
+  updated_at timestamptz not null default now(),
+  unique (shop_id, customer_id)
+);
+
+create table if not exists public.cart_items (
+  id uuid primary key default gen_random_uuid(),
+  cart_id uuid not null references public.carts(id) on delete cascade,
+  product_id uuid not null references public.products(id) on delete cascade,
+  quantity integer not null default 1 check (quantity > 0),
+  selected_options jsonb not null default '{}'::jsonb,
+  customization jsonb,
+  created_at timestamptz not null default now()
+);
+create index if not exists cart_items_cart_idx on public.cart_items (cart_id);
+
+create table if not exists public.customization_requests (
+  id uuid primary key default gen_random_uuid(),
+  shop_id uuid not null references public.shops(id) on delete cascade,
+  customer_id uuid not null references auth.users(id) on delete cascade,
+  product_id uuid references public.products(id) on delete set null,
+  details text not null,
+  reference_image_path text,
+  status text not null default 'pending'
+    check (status in ('pending', 'quoted', 'approved', 'declined', 'closed')),
+  quote_amount numeric(12, 2) check (quote_amount is null or quote_amount >= 0),
+  quote_note text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists customization_requests_shop_idx
+  on public.customization_requests (shop_id, status, created_at desc);
+
+create table if not exists public.messages (
+  id uuid primary key default gen_random_uuid(),
+  shop_id uuid not null references public.shops(id) on delete cascade,
+  customer_id uuid not null references auth.users(id) on delete cascade,
+  sender text not null check (sender in ('customer', 'staff')),
+  body text not null default '',
+  attachment_path text,
+  is_read boolean not null default false,
+  created_at timestamptz not null default now(),
+  check (body <> '' or attachment_path is not null)
+);
+create index if not exists messages_thread_idx
+  on public.messages (shop_id, customer_id, created_at);
+
+create table if not exists public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  shop_id uuid not null references public.shops(id) on delete cascade,
+  customer_id uuid not null references auth.users(id) on delete cascade,
+  type text not null default 'general'
+    check (type in ('general', 'order', 'payment', 'customization', 'message')),
+  title text not null,
+  body text not null default '',
+  link text not null default '',
+  is_read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists notifications_customer_idx
+  on public.notifications (customer_id, shop_id, is_read, created_at desc);
+
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  shop_id uuid not null references public.shops(id) on delete cascade,
+  product_id uuid not null references public.products(id) on delete cascade,
+  customer_id uuid not null references auth.users(id) on delete cascade,
+  order_item_id uuid not null references public.order_items(id) on delete cascade,
+  rating integer not null check (rating between 1 and 5),
+  body text not null default '',
+  image_path text,
+  status text not null default 'pending'
+    check (status in ('pending', 'approved', 'rejected')),
+  reply text not null default '',
+  created_at timestamptz not null default now(),
+  -- one review per purchased order item
+  unique (order_item_id)
+);
+create index if not exists reviews_product_idx
+  on public.reviews (product_id, status, created_at desc);
+
+-- The tracking timeline: one row per status change, written by the server.
+create table if not exists public.order_events (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null references public.orders(id) on delete cascade,
+  status text not null,
+  note text not null default '',
+  created_at timestamptz not null default now()
+);
+create index if not exists order_events_order_idx
+  on public.order_events (order_id, created_at);
+
+drop trigger if exists carts_set_updated_at on public.carts;
+create trigger carts_set_updated_at
+  before update on public.carts
+  for each row execute function public.set_updated_at();
+
+drop trigger if exists customization_requests_set_updated_at on public.customization_requests;
+create trigger customization_requests_set_updated_at
+  before update on public.customization_requests
+  for each row execute function public.set_updated_at();
+
 -- Public browser roles must not read or modify private customer/order tables.
 -- Express mediates reads and writes with the server-only service-role key.
 alter table public.shops enable row level security;
@@ -797,14 +960,26 @@ alter table public.promotions enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 alter table public.promotion_redemptions enable row level security;
+alter table public.product_images enable row level security;
+alter table public.carts enable row level security;
+alter table public.cart_items enable row level security;
+alter table public.customization_requests enable row level security;
+alter table public.messages enable row level security;
+alter table public.notifications enable row level security;
+alter table public.reviews enable row level security;
+alter table public.order_events enable row level security;
 
 revoke all on public.shops, public.profiles, public.staff_members, public.categories,
   public.products, public.promotions, public.orders, public.order_items,
-  public.promotion_redemptions from anon, authenticated;
+  public.promotion_redemptions, public.product_images, public.carts, public.cart_items,
+  public.customization_requests, public.messages, public.notifications, public.reviews,
+  public.order_events from anon, authenticated;
 
 grant all on public.shops, public.profiles, public.staff_members, public.categories,
   public.products, public.promotions, public.orders, public.order_items,
-  public.promotion_redemptions to service_role;
+  public.promotion_redemptions, public.product_images, public.carts, public.cart_items,
+  public.customization_requests, public.messages, public.notifications, public.reviews,
+  public.order_events to service_role;
 
 revoke execute on function public.set_updated_at() from public, anon, authenticated;
 revoke execute on function public.product_option_delta(jsonb, jsonb) from public, anon, authenticated;

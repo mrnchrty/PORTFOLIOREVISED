@@ -29,6 +29,12 @@
       accountMessage: $('account-message'),
       accountSessionLabel: $('account-session-label'),
       backendStatus: document.querySelector('[data-backend-status]'),
+      headerAuthGuest: $('header-auth-guest'),
+      headerAccountMenu: $('header-account-menu'),
+      headerAccountToggle: $('header-account-toggle'),
+      headerAccountDropdown: $('header-account-dropdown'),
+      headerAccountName: $('header-account-name'),
+      headerLogout: $('header-logout'),
       cartCount: $('cart-count'),
       cartCountText: document.querySelector('[data-cart-count-text]'),
       cartDiscount: $('cart-discount'),
@@ -100,6 +106,9 @@
     };
     let checkoutConfig = null;
     let currentUser = null;
+    // When a guest tries to add to cart, remember the product so we can
+    // return them to it right after they sign in or create an account.
+    let pendingCartIntent = null;
     let profile = null;
     let staffMemberships = [];
     let selectedPaymentMethod = '';
@@ -127,6 +136,34 @@
 
     function money(amount) {
       return api.formatMoney(amount, shopInfo.currency || setup.currency || 'PHP');
+    }
+
+    function productSalePrice(product) {
+      const sale = Number(product?.sale_price);
+      const base = Number(product?.price);
+      if (Number.isFinite(sale) && sale >= 0 && Number.isFinite(base) && sale < base) return sale;
+      return null;
+    }
+
+    // The price a customer actually pays: the sale price when one is set and
+    // lower than the list price. Mirrors create_shop_order in the database.
+    function effectivePrice(product) {
+      const sale = productSalePrice(product);
+      return sale === null ? Number(product?.price) : sale;
+    }
+
+    function productStock(product) {
+      if (product?.stock === null || product?.stock === undefined) return null;
+      const stock = Number(product.stock);
+      return Number.isFinite(stock) ? stock : null;
+    }
+
+    function stockLabel(product) {
+      const stock = productStock(product);
+      if (stock === null) return 'Made to order';
+      if (stock <= 0) return 'Out of stock';
+      if (stock <= 5) return `Only ${stock} left`;
+      return `${stock} in stock`;
     }
 
     function isPricePending(product) {
@@ -273,7 +310,7 @@
         if (!product) return sum;
         const options = getOptionDetails(product, item.options);
         if (!options.valid) return sum;
-        return sum + (Number(product.price) + options.delta) * item.quantity;
+        return sum + (effectivePrice(product) + options.delta) * item.quantity;
       }, 0);
     }
 
@@ -313,7 +350,7 @@
       const product = productById(item.productId);
       if (!product) return '';
       const options = getOptionDetails(product, item.options);
-      const validPrice = options.valid ? Number(product.price) + options.delta : null;
+      const validPrice = options.valid ? effectivePrice(product) + options.delta : null;
       const lineTotal = validPrice === null ? null : validPrice * item.quantity;
       const imageAlt = product.is_sample ? `${product.name} sample image` : product.name;
       const optionText = options.labels.length ? options.labels.join(' · ') : 'No options selected';
@@ -371,7 +408,7 @@
             const product = productById(item.productId);
             if (!product) return '';
             const optionDetails = getOptionDetails(product, item.options);
-            const price = optionDetails.valid ? (Number(product.price) + optionDetails.delta) * item.quantity : null;
+            const price = optionDetails.valid ? (effectivePrice(product) + optionDetails.delta) * item.quantity : null;
             const optionSummary = optionDetails.labels.length ? ` <span class="muted">(${html(optionDetails.labels.join(', '))})</span>` : '';
             return `<div class="summary-row"><span class="checkout-item-name">${html(product.name)} × ${item.quantity}${optionSummary}</span><strong>${price === null ? 'Options needed' : money(price)}</strong></div>`;
           }).join('');
@@ -500,17 +537,24 @@
     function productCard(product) {
       const productId = html(product.id);
       const hasOptions = normalizedOptionGroups(product).length > 0;
-      const price = Number(product.price);
+      const price = effectivePrice(product);
+      const salePriceValue = productSalePrice(product);
+      const stock = productStock(product);
+      const outOfStock = stock !== null && stock <= 0;
       const pricePending = isPricePending(product);
-      const productIsAvailable = Boolean(product.available) && !pricePending;
+      const productIsAvailable = Boolean(product.available) && !pricePending && !outOfStock;
       const imageAlt = product.is_sample ? `${product.name} sample image` : product.name;
       const primaryAction = hasOptions ? 'details' : 'add';
       const primaryLabel = pricePending
         ? 'Price pending'
-        : (!productIsAvailable ? 'Unavailable' : (hasOptions ? 'Choose options' : 'Add to cart'));
+        : (outOfStock ? 'Out of stock'
+          : (!productIsAvailable ? 'Unavailable' : (hasOptions ? 'Choose options' : 'Add to cart')));
       const primaryDisabled = productIsAvailable ? '' : 'disabled';
       const featuredBadge = product.is_featured
         ? '<span class="product-badge">Featured</span>'
+        : '';
+      const saleBadge = salePriceValue !== null && !pricePending
+        ? '<span class="product-badge sale-badge">Sale</span>'
         : '';
       const sampleBadge = product.is_sample && !pricePending
         ? '<span class="product-badge sample-badge">Demo sample</span>'
@@ -518,7 +562,10 @@
       const pendingBadge = pricePending ? '<span class="product-badge sample-badge">Price pending</span>' : '';
       const priceLabel = pricePending
         ? 'Price to be confirmed'
-        : (!Number.isFinite(price) ? 'Price not set' : `${hasOptions ? 'From ' : ''}${money(price)}`);
+        : (!Number.isFinite(price) ? 'Price not set'
+          : (salePriceValue !== null
+            ? `<s class="price-was">${money(Number(product.price))}</s> ${hasOptions ? 'From ' : ''}${money(price)}`
+            : `${hasOptions ? 'From ' : ''}${money(price)}`));
 
       return `
         <article class="store-product-card">
@@ -530,13 +577,14 @@
               loading="lazy"
               data-fallback="${html(fallbackImage())}"
             />
-            <div class="product-badges">${featuredBadge}${sampleBadge}${pendingBadge}</div>
+            <div class="product-badges">${saleBadge}${featuredBadge}${sampleBadge}${pendingBadge}</div>
           </div>
           <div class="store-product-copy">
             <span class="store-product-category">${html(productCategoryName(product))}</span>
             <h3 class="store-product-title">${html(product.name)}</h3>
             <p class="store-product-description">${html(product.description || 'Product details will be added by the shop owner.')}</p>
             <span class="product-availability${product.is_sample ? ' is-sample' : (productIsAvailable ? '' : ' is-unavailable')}">${pricePending ? 'Price to be confirmed' : (product.is_sample ? 'Sample listing · confirm before live orders' : (productIsAvailable ? 'Available to order' : 'Currently unavailable'))}</span>
+            <span class="product-stock${outOfStock ? ' is-out' : ''}">${html(stockLabel(product))}</span>
             <div class="product-card-footer">
               <strong class="product-price">${priceLabel}</strong>
               <button class="store-button store-button-primary" type="button" data-product-action="${primaryAction}" data-id="${productId}" ${primaryDisabled}>${primaryLabel}</button>
@@ -790,6 +838,14 @@
           : 'Sign in to view the menu <span aria-hidden="true">↓</span>';
       }
       if (elements.accountSessionLabel) elements.accountSessionLabel.textContent = signedIn ? currentUser.email : 'Not signed in';
+      if (elements.headerAuthGuest) elements.headerAuthGuest.hidden = signedIn;
+      if (elements.headerAccountMenu) elements.headerAccountMenu.hidden = !signedIn;
+      if (elements.headerAccountName) {
+        elements.headerAccountName.textContent = signedIn
+          ? (profile?.full_name || currentUser.email || 'Account')
+          : 'Account';
+      }
+      if (!signedIn) closeHeaderAccountMenu();
       if (elements.dashboardWelcome) elements.dashboardWelcome.textContent = `Welcome${profile?.full_name ? `, ${profile.full_name}` : ''}`;
       if (elements.dashboardEmail) elements.dashboardEmail.textContent = currentUser?.email || '';
       if (signedIn && elements.checkoutName && !elements.checkoutName.value) {
@@ -875,6 +931,7 @@
         form.reset();
         await loadAccount();
         setMessage(elements.accountMessage, 'You are signed in. Your account and order history are scoped to this shop.', 'success');
+        resumePendingCartIntent();
       } catch (error) {
         setMessage(elements.loginMessage, error.message || 'Sign-in could not be completed.', 'error');
       } finally {
@@ -902,6 +959,7 @@
         if (result.authenticated) {
           await loadAccount();
           setMessage(elements.accountMessage, result.message || 'Your account is ready.', 'success');
+          resumePendingCartIntent();
         } else {
           setMessage(elements.registerMessage, result.message || 'Check your email to confirm your account, then sign in.', 'success');
         }
@@ -932,6 +990,18 @@
       } finally {
         setButtonBusy(button, false, '', 'Save account details');
       }
+    }
+
+    function openHeaderAccountMenu() {
+      if (!elements.headerAccountDropdown) return;
+      elements.headerAccountDropdown.hidden = false;
+      elements.headerAccountToggle?.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeHeaderAccountMenu() {
+      if (!elements.headerAccountDropdown) return;
+      elements.headerAccountDropdown.hidden = true;
+      elements.headerAccountToggle?.setAttribute('aria-expanded', 'false');
     }
 
     async function handleLogout() {
@@ -1204,6 +1274,18 @@
 
     function addToCart(product, options = {}) {
       if (!product || !product.available) return;
+      if (!currentUser && elements.loginForm) {
+        pendingCartIntent = { productId: String(product.id), options };
+        closeProductDialog();
+        setMessage(
+          elements.accountMessage,
+          'Log in or create an account to add items to your cart. We will bring you back to this product.',
+          'info',
+        );
+        elements.loginForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        elements.loginForm.querySelector('input')?.focus({ preventScroll: true });
+        return;
+      }
       const candidate = { productId: String(product.id), quantity: 1, options };
       const existing = cart.find((item) => itemKey(item) === itemKey(candidate));
       if (existing) existing.quantity = Math.min(99, existing.quantity + 1);
@@ -1213,6 +1295,19 @@
       refreshQuote();
       const cartSection = $('cart');
       if (cartSection) cartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resumePendingCartIntent() {
+      if (!pendingCartIntent || !currentUser) return;
+      const intent = pendingCartIntent;
+      pendingCartIntent = null;
+      const product = productById(intent.productId);
+      if (!product) return;
+      if (normalizedOptionGroups(product).length > 0 || product.customization) {
+        openProductDetails(product);
+      } else {
+        addToCart(product, intent.options || {});
+      }
     }
 
     function renderOptionGroup(group, product, currentSelections) {
@@ -1359,7 +1454,7 @@
 
     function updateDialogPrice(form, product) {
       const result = validateOptionForm(form, product);
-      const price = Number(product.price) + result.details.delta;
+      const price = effectivePrice(product) + result.details.delta;
       const label = form.querySelector('[data-live-price]');
       if (label) label.textContent = result.valid ? money(price) : 'Select valid options';
       const message = form.querySelector('[data-option-message]');
@@ -1628,6 +1723,44 @@
       elements.profileForm?.addEventListener('submit', handleProfileUpdate);
       elements.logoutButton?.addEventListener('click', handleLogout);
       elements.refreshOrders?.addEventListener('click', loadDashboard);
+
+      elements.headerAccountToggle?.addEventListener('click', () => {
+        const isOpen = elements.headerAccountDropdown?.hidden === false;
+        if (isOpen) closeHeaderAccountMenu();
+        else openHeaderAccountMenu();
+      });
+      elements.headerAccountDropdown?.addEventListener('click', (event) => {
+        const jump = event.target.closest('[data-account-jump]');
+        if (jump) {
+          closeHeaderAccountMenu();
+          closeMobileMenu();
+          const target = $(jump.dataset.accountJump);
+          if (target) {
+            event.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+      elements.headerLogout?.addEventListener('click', async () => {
+        closeHeaderAccountMenu();
+        await handleLogout();
+        $('account')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      document.addEventListener('click', (event) => {
+        if (elements.headerAccountMenu && !elements.headerAccountMenu.contains(event.target)) {
+          closeHeaderAccountMenu();
+        }
+      });
+      document.querySelectorAll('[data-auth-jump]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          const form = $(link.dataset.authJump);
+          if (!form) return;
+          event.preventDefault();
+          closeMobileMenu();
+          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          form.querySelector('input')?.focus({ preventScroll: true });
+        });
+      });
 
       document.querySelectorAll('[data-scroll-to]').forEach((button) => {
         button.addEventListener('click', () => {
