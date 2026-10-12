@@ -459,10 +459,6 @@ body.storefront-mochajaki {
   color: #8a6039;
 }
 
-.storefront-mochajaki #menu-entry-cta {
-  gap: 9px;
-}
-
 @media (max-width: 650px) {
   .storefront-mochajaki .account-section {
     padding-block: 36px;

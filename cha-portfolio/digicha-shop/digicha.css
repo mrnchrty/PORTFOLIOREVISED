@@ -61,6 +61,39 @@ body.storefront-digicha {
   color: #fff;
 }
 
+.storefront-digicha .store-account-guest {
+  border-left-color: rgba(255, 255, 255, 0.16);
+}
+
+.storefront-digicha .store-account-guest > a {
+  color: rgba(255, 245, 248, 0.76);
+}
+
+.storefront-digicha .store-account-guest > a:hover {
+  background: rgba(237, 57, 127, 0.16);
+  color: #ff9fc2;
+}
+
+.storefront-digicha .store-account-sep {
+  color: rgba(255, 245, 248, 0.45);
+}
+
+.storefront-digicha .store-account-member {
+  border-color: rgba(255, 139, 179, 0.38);
+  background: #2a171f;
+  color: #ff9fc2;
+}
+
+.storefront-digicha .store-account-member:hover {
+  background: #ed397f;
+  color: #fff;
+}
+
+.storefront-digicha .store-account-avatar {
+  border-color: rgba(255, 139, 179, 0.38);
+  background: #2a171f;
+}
+
 .storefront-digicha .store-menu-toggle {
   border-color: rgba(255, 139, 179, 0.38);
   background: #2a171f;

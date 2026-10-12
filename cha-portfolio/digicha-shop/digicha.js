@@ -3,25 +3,25 @@
     {
       id: 'gcash',
       label: 'GCash',
-      instructions: 'Preview only. The shop must add verified GCash instructions before accepting payment.',
+      instructions: 'GCash details are shared with your order confirmation.',
       type: 'manual',
     },
     {
       id: 'maya',
       label: 'Maya',
-      instructions: 'Preview only. The shop must add verified Maya instructions before accepting payment.',
+      instructions: 'Maya details are shared with your order confirmation.',
       type: 'manual',
     },
     {
       id: 'other',
       label: 'Other',
-      instructions: 'Preview only. Confirm any other payment arrangement with the shop.',
+      instructions: 'Other payment arrangements are confirmed with the shop.',
       type: 'manual',
     },
   ];
 
   const image = '../assets/images/product-placeholder.svg';
-  const sampleDescription = 'Sample product idea with a suggested PHP price. Confirm final size, material, artwork, and price before accepting real orders.';
+  const sampleDescription = 'Personalized to order. Final artwork, material, and size are confirmed with DigiCha.';
   const categories = [
     { id: 'stickers', name: 'Stickers', slug: 'stickers' },
     { id: 'mugs', name: 'Mugs', slug: 'mugs' },

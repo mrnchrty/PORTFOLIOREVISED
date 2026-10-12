@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#17142d" />
     <meta
       name="description"
-      content="Browse DigiCha sample custom stickers, mugs, keychains, tarpaulins, certificates, and personalized gifts."
+      content="DigiCha personalizes stickers, mugs, keychains, tarpaulins, certificates, and gift sets with your names, photos, and favorite details."
     />
     <title>DigiCha | Custom Prints &amp; Gifts</title>
     <link rel="stylesheet" href="../shared/storefront.css" />
@@ -34,11 +34,28 @@
         <nav class="store-nav" id="store-navigation" aria-label="DigiCha navigation">
           <a href="#catalog">Shop</a>
           <a href="#deals">Deals</a>
-          <a href="#account">My account</a>
           <a class="store-back-link" href="../portfolio/">Portfolio</a>
           <a class="store-cart-link" href="#cart" aria-label="Go to shopping cart">
             Cart <span id="cart-count" class="cart-count">0</span>
           </a>
+          <span class="store-account">
+            <span class="store-account-guest" data-account-guest>
+              <a href="#account" data-auth-mode="login">Log In</a>
+              <span class="store-account-sep" aria-hidden="true">|</span>
+              <a href="#account" data-auth-mode="register">Create Account</a>
+            </span>
+            <a class="store-account-member" href="#account" data-account-member hidden>
+              <img
+                class="store-account-avatar"
+                id="store-account-avatar"
+                src="../assets/images/account-avatar-default.svg"
+                alt=""
+                width="34"
+                height="34"
+              />
+              <span>My Account</span>
+            </a>
+          </span>
         </nav>
       </div>
     </header>
@@ -59,15 +76,9 @@
             <span class="store-kicker">Custom details, made yours</span>
             <h1 id="store-title">Little things.<br /><span>Big meaning.</span></h1>
             <p>
-              Browse sample stickers, mugs, keychains, tarpaulins, certificates, and personalized gifts.
-              Choose a style, then share the details you want customized.
+              Stickers, mugs, keychains, tarpaulins, certificates, and gift sets, decorated with your
+              names, photos, and favorite details. Small, personal pieces made to keep.
             </p>
-            <div class="store-hero-actions">
-              <a class="store-button store-button-primary" href="#catalog">Browse the shop <span aria-hidden="true">↓</span></a>
-              <button class="store-button store-button-light" type="button" data-scroll-to="account">
-                Sign in / create account
-              </button>
-            </div>
             <p class="store-config-status" data-backend-status role="status" aria-live="polite">
               Loading shop catalog…
             </p>
@@ -91,7 +102,7 @@
               <span class="store-kicker">Find your kind of custom</span>
               <h2 id="digi-category-title">Shop by category</h2>
             </div>
-            <p>Sample product concepts and suggested PHP prices. Final sizes, materials, artwork, and pricing are for owner review.</p>
+            <p>Each category lists its designs, sizes, and prices in Philippine pesos.</p>
           </div>
           <div class="digi-category-grid">
             <button class="digi-category-card" type="button" data-shop-category="Stickers">
@@ -120,7 +131,7 @@
               <span class="store-kicker">A few ideas to start</span>
               <h2 id="featured-title">Sample product ideas</h2>
             </div>
-            <p>Suggestions use the sample catalog and your current cart, not purchase history.</p>
+            <p>Picks drawn from what is in the shop and in your cart.</p>
           </div>
           <div class="store-product-grid" id="suggestion-grid">
             <p class="store-empty">Suggestions will appear after products are available to order.</p>
@@ -133,7 +144,7 @@
           <div class="store-section-heading">
             <div>
               <span class="store-kicker">The collection</span>
-              <h2 id="catalog-title">Browse all products</h2>
+              <h2 id="catalog-title">All products</h2>
             </div>
             <span class="store-mode" data-mode-label>Loading</span>
           </div>
@@ -181,7 +192,7 @@
               <span class="store-kicker">Only active shop offers</span>
               <h2 id="deals-title">Deals &amp; promotions</h2>
             </div>
-            <p>Only configured, active offers appear here. Fixed discounts and totals are displayed in Philippine pesos (PHP).</p>
+            <p>Running offers appear here, with discounts shown in Philippine pesos (PHP).</p>
           </div>
           <div class="store-deals-grid" id="deals-grid">
             <p class="store-empty">Checking for active deals…</p>
@@ -211,7 +222,7 @@
                 <span>Discount</span><strong id="cart-discount">−₱0.00</strong>
               </div>
               <div class="summary-row summary-total"><span>Estimated total</span><strong id="cart-total">₱0.00</strong></div>
-              <p class="summary-note">Final product prices, availability, and discounts are verified by the server when an order is placed. No unconfigured fees are added.</p>
+              <p class="summary-note">Prices, availability, and discounts are confirmed when your order is placed. No extra fees are added.</p>
               <form class="promo-form" id="promo-form">
                 <label for="promo-code">Have a promo code?</label>
                 <div class="promo-input-row">
@@ -244,7 +255,7 @@
           <div class="store-checkout-layout">
             <form class="store-panel checkout-form" id="checkout-form">
               <h3>Order details</h3>
-              <p class="muted">Sign in or create an account below to continue. Your email is taken from your authenticated account.</p>
+              <p class="muted">Your order is saved to the account you are logged in with.</p>
               <div class="store-form-grid">
                 <label class="store-field">
                   <span>Full name</span>
@@ -273,7 +284,7 @@
               </div>
               <fieldset class="payment-options" id="payment-options">
                 <legend>Payment method</legend>
-                <p class="muted">GCash, Maya, and Other are shown as setup choices. Payment details and ordering become available after the shop is connected.</p>
+                <p class="muted">Choose how you would like to pay.</p>
                 <div id="payment-method-list"></div>
               </fieldset>
               <p class="payment-instructions" id="payment-instructions" hidden></p>
@@ -285,7 +296,6 @@
             <aside class="store-panel checkout-review" aria-labelledby="checkout-review-title">
               <h3 id="checkout-review-title">Order review</h3>
               <div id="checkout-review"><p class="store-empty">Your cart is empty.</p></div>
-              <a class="account-shortcut" href="#account">Need an account? Sign in or register <span aria-hidden="true">↗</span></a>
             </aside>
           </div>
         </div>
@@ -298,12 +308,12 @@
               <span class="store-kicker">Your shop profile</span>
               <h2 id="account-title">Account &amp; orders</h2>
             </div>
-            <span class="account-session-label" id="account-session-label">Not signed in</span>
+            <span class="account-session-label" id="account-session-label">Not logged in</span>
           </div>
-          <div id="account-forms" class="account-auth-grid">
+          <div id="account-forms" class="account-auth-grid" data-auth-mode="login">
             <form class="store-panel account-form" id="login-form">
               <span class="account-form-label">Welcome back</span>
-              <h3>Sign in</h3>
+              <h3>Log In</h3>
               <label class="store-field">
                 <span>Email</span>
                 <input name="email" type="email" maxlength="254" autocomplete="email" required />
@@ -312,12 +322,13 @@
                 <span>Password</span>
                 <input name="password" type="password" minlength="8" maxlength="128" autocomplete="current-password" required />
               </label>
-              <button class="store-button store-button-primary" type="submit">Sign in</button>
+              <button class="store-button store-button-primary" type="submit">Log In</button>
               <p class="form-feedback" id="login-message" role="status" aria-live="polite"></p>
+              <p class="account-form-switch">New here? <a href="#account" data-auth-mode="register">Create Account</a></p>
             </form>
-            <form class="store-panel account-form" id="register-form">
+            <form class="store-panel account-form" id="register-form" hidden>
               <span class="account-form-label">First time here?</span>
-              <h3>Create an account</h3>
+              <h3>Create Account</h3>
               <label class="store-field">
                 <span>Full name</span>
                 <input name="fullName" type="text" minlength="2" maxlength="120" autocomplete="name" required />
@@ -330,20 +341,31 @@
                 <span>Password <small>(at least 8 characters)</small></span>
                 <input name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required />
               </label>
-              <button class="store-button store-button-secondary" type="submit">Create account</button>
+              <button class="store-button store-button-secondary" type="submit">Create Account</button>
               <p class="form-feedback" id="register-message" role="status" aria-live="polite"></p>
+              <p class="account-form-switch">Already have an account? <a href="#account" data-auth-mode="login">Log In</a></p>
             </form>
           </div>
 
           <section class="store-panel customer-dashboard" id="customer-dashboard" hidden aria-label="Customer dashboard">
             <div class="dashboard-topline">
-              <div>
-                <span class="account-form-label">Your dashboard</span>
-                <h3 id="dashboard-welcome">Welcome</h3>
-                <p id="dashboard-email" class="muted"></p>
-                <a class="account-admin-link" id="store-admin-link" hidden></a>
+              <div class="dashboard-identity">
+                <img
+                  class="dashboard-avatar"
+                  data-dashboard-avatar
+                  src="../assets/images/account-avatar-default.svg"
+                  alt=""
+                  width="72"
+                  height="72"
+                />
+                <div>
+                  <span class="account-form-label">Your dashboard</span>
+                  <h3 id="dashboard-welcome">Welcome</h3>
+                  <p id="dashboard-email" class="muted"></p>
+                  <a class="account-admin-link" id="store-admin-link" hidden></a>
+                </div>
               </div>
-              <button class="store-button store-button-quiet" id="logout-button" type="button">Sign out</button>
+              <button class="store-button store-button-quiet" id="logout-button" type="button">Log Out</button>
             </div>
             <form class="profile-form" id="profile-form">
               <h4>Account information</h4>
@@ -367,13 +389,13 @@
                   <button class="text-button" id="refresh-orders" type="button">Refresh</button>
                 </div>
                 <div class="customer-orders" id="customer-orders">
-                  <p class="store-empty">Sign in to load your real order history.</p>
+                  <p class="store-empty">Your order history appears here once you are logged in.</p>
                 </div>
               </section>
               <section>
                 <h4>Available deals</h4>
                 <div class="dashboard-deals" id="dashboard-deals">
-                  <p class="store-empty">No customer-specific deals are shown until they are configured.</p>
+                  <p class="store-empty">No personal offers right now.</p>
                 </div>
               </section>
             </div>
@@ -394,7 +416,7 @@
           <span class="store-brand-mark" aria-hidden="true">D<span>✦</span></span>
           <span class="store-brand-name">DigiCha</span>
         </a>
-        <p>Independent shop identity · Catalog and orders stored separately from Mochajaki.</p>
+        <p>Custom stickers, mugs, keychains, tarpaulins, certificates, and gift sets, personalized to order.</p>
         <a href="../portfolio/">Return to Cha’s portfolio</a>
       </div>
     </footer>

@@ -3,26 +3,26 @@
     {
       id: 'gcash',
       label: 'GCash',
-      instructions: 'Preview only. The shop must add verified GCash instructions before accepting payment.',
+      instructions: 'GCash details are shared with your order confirmation.',
       type: 'manual',
     },
     {
       id: 'maya',
       label: 'Maya',
-      instructions: 'Preview only. The shop must add verified Maya instructions before accepting payment.',
+      instructions: 'Maya details are shared with your order confirmation.',
       type: 'manual',
     },
     {
       id: 'other',
       label: 'Other',
-      instructions: 'Preview only. Confirm any other payment arrangement with the shop.',
+      instructions: 'Other payment arrangements are confirmed with the shop.',
       type: 'manual',
     },
   ];
 
   const image = '../assets/images/food-placeholder.svg';
-  const sampleDescription = 'Sample menu idea with a suggested PHP price. Confirm flavor, portion, and final price before accepting real orders.';
-  const comboDescription = 'Sample food-combo suggestion with a proposed bundle price. Confirm the included items and price before publishing.';
+  const sampleDescription = 'Prepared to order. Size, flavor, and portion are confirmed with Mochajaki.';
+  const comboDescription = 'A bundle of the listed items at one price.';
   const categories = [
     { id: 'pasta', name: 'Pasta', slug: 'pasta', sort_order: 1 },
     { id: 'beverages', name: 'Beverages', slug: 'beverages', sort_order: 2 },
@@ -61,25 +61,25 @@
   const products = [
     {
       id: 'mochajaki-lasagna', category_id: 'pasta', category_name: 'Pasta',
-      name: 'Lasagna', description: 'Choose Small or Big. Menu prices were supplied by the owner.',
+      name: 'Lasagna', description: 'Choose Small or Big.',
       price: 50, available: true, is_sample: false, is_featured: false,
       options: sizeOptions(50, 70),
     },
     {
       id: 'mochajaki-palabok', category_id: 'pasta', category_name: 'Pasta',
-      name: 'Palabok', description: 'Choose Small or Big. Menu prices were supplied by the owner.',
+      name: 'Palabok', description: 'Choose Small or Big.',
       price: 40, available: true, is_sample: false, is_featured: false,
       options: sizeOptions(40, 60),
     },
     {
       id: 'mochajaki-bake-mac', category_id: 'pasta', category_name: 'Pasta',
-      name: 'Bake Mac', description: 'Choose Small or Big. Menu prices were supplied by the owner.',
+      name: 'Bake Mac', description: 'Choose Small or Big.',
       price: 50, available: true, is_sample: false, is_featured: false,
       options: sizeOptions(50, 70),
     },
     {
       id: 'mochajaki-mac-and-cheese', category_id: 'pasta', category_name: 'Pasta',
-      name: 'Mac & Cheese', description: 'Choose Small or Big. Menu prices were supplied by the owner.',
+      name: 'Mac & Cheese', description: 'Choose Small or Big.',
       price: 50, available: true, is_sample: false, is_featured: false,
       options: sizeOptions(50, 70),
     },
@@ -143,17 +143,17 @@
     {
       id: 'mochajaki-combo-pasta-coffee', category_id: 'combo-deals', category_name: 'Combo Deals',
       name: 'Palabok & Iced Coffee Combo', price: 95,
-      description: 'Sample combo: Small Palabok with one regular Iced Coffee. Suggested bundle price for owner review.',
+      description: 'Small Palabok paired with one regular Iced Coffee.',
     },
     {
       id: 'mochajaki-combo-burger-fries', category_id: 'combo-deals', category_name: 'Combo Deals',
       name: 'Homemade Burger & Fries Combo', price: 125,
-      description: 'Sample combo: Single-patty Homemade Burger with regular fries. Suggested bundle price for owner review.',
+      description: 'Single-patty Homemade Burger with regular fries.',
     },
     {
       id: 'mochajaki-combo-chicken-milk-tea', category_id: 'combo-deals', category_name: 'Combo Deals',
       name: 'Chicken Rice & Milk Tea Combo', price: 160,
-      description: 'Sample combo: Regular Classic Chicken with Rice and one regular Classic Milk Tea. Suggested bundle price for owner review.',
+      description: 'Regular Classic Chicken with Rice and one regular Classic Milk Tea.',
     },
   ].map((product, index) => ({
     ...product,

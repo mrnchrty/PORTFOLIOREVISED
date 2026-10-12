@@ -6,6 +6,8 @@ This document distinguishes verified changes from requested work that has not be
 - `portfolio/about/index.html`, `style.css`, `script.js` and `portfolio/resume/index.html`, `style.css`, `script.js` are separate editable pages.
 - Fixed `backend/package.json`'s `npm run check` command, which incorrectly referenced the deleted `portfolio/about/about.js`. `npm run check` now exits successfully.
 
+- Storefront headers use a single account entry point (Log In | Create Account, then the account image with My Account), and owner-directed instruction text was removed from the visitor-facing shop copy. The signed-in state has **not** been exercised against a live Supabase project.
+
 ## Outstanding / not verified
 - The Digicha shop still contains a promo-code field, and shared storefront logic still references promo codes. The instruction to remove all promo-code functionality is **not complete**.
 - The provided project has not undergone browser interaction, accessibility, responsive, or end-to-end tests.
