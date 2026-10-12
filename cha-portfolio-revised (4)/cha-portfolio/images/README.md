@@ -1,12 +1,19 @@
 # Portfolio image paths
 
-Add your own files here; this folder intentionally contains no generated or substitute personal images. Referenced paths:
+This folder holds **real photographs and screenshots** you add yourself. It currently contains one file:
 
-- `meditrack.png` — MediTrack screenshot
-- `e-gasang.png` — E-Gasang screenshot
-- `publication-01.jpg` to `publication-03.jpg` — publication materials
-- `certificate-01.jpg` to `certificate-03.jpg` — certificates
-- `writing-01.jpg` to `writing-03.jpg` — writing/publication screenshots
-- `mabini-coastline.jpg`, `mabini-local-places.jpg`, `mabini-community.jpg` — personal Mabini photographs
+- `NEXTGEN CERTI.png` — used in the Projects page, Certificates gallery.
 
-The HTML includes descriptive alt text and these paths can be edited directly.
+Everywhere else still uses the neutral placeholder illustrations in `assets/images/`. To replace one, edit the `src` in the page and point it here, for example `../../images/meditrack.png` from `portfolio/projects/projects.html`.
+
+Placeholders currently in use, and the slot each one stands in for:
+
+| Placeholder | Used by |
+| --- | --- |
+| `cha-profile-placeholder.svg` | About Me main portrait and the first gallery tile |
+| `creative-placeholder.svg` | About Me tile 2, publication previews, certificate previews, writing samples |
+| `food-placeholder.svg` | About Me tile 3 (cooking or baking) |
+| `mabini-placeholder.svg` | About Me tile 4, Discover Mabini |
+| `project-placeholder.svg` | About Me tile 5, the MediTrack and E-Gasang previews |
+
+The HTML already carries descriptive `alt` text for each slot, so replacing an image needs no markup change beyond the `src`.
