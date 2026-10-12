@@ -213,7 +213,7 @@
         </div>
       </section>
 
-      <section class="store-section cart-section" id="cart" aria-labelledby="cart-title">
+      <section class="store-section cart-section" id="cart" aria-labelledby="cart-title" data-auth-only hidden>
         <div class="store-container">
           <div class="store-section-heading">
             <div>
@@ -254,7 +254,7 @@
         </div>
       </section>
 
-      <section class="store-section checkout-section" id="checkout" aria-labelledby="checkout-title">
+      <section class="store-section checkout-section" id="checkout" aria-labelledby="checkout-title" data-auth-only hidden>
         <div class="store-container">
           <div class="store-section-heading">
             <div>
@@ -315,7 +315,7 @@
         </div>
       </section>
 
-      <section class="store-section account-section" id="account" aria-labelledby="account-title">
+      <section class="store-section account-section" id="account" aria-labelledby="account-title" data-auth-only hidden>
         <div class="store-container">
           <div class="store-section-heading">
             <div>
@@ -323,40 +323,6 @@
               <h2 id="account-title">Account &amp; orders</h2>
             </div>
             <span class="account-session-label" id="account-session-label">Not signed in</span>
-          </div>
-          <div id="account-forms" class="account-auth-grid">
-            <form class="store-panel account-form" id="login-form">
-              <span class="account-form-label">Welcome back</span>
-              <h3>Sign in</h3>
-              <label class="store-field">
-                <span>Email</span>
-                <input name="email" type="email" maxlength="254" autocomplete="email" required />
-              </label>
-              <label class="store-field">
-                <span>Password</span>
-                <input name="password" type="password" minlength="8" maxlength="128" autocomplete="current-password" required />
-              </label>
-              <button class="store-button store-button-primary" type="submit">Sign in</button>
-              <p class="form-feedback" id="login-message" role="status" aria-live="polite"></p>
-            </form>
-            <form class="store-panel account-form" id="register-form">
-              <span class="account-form-label">First time here?</span>
-              <h3>Create an account</h3>
-              <label class="store-field">
-                <span>Full name</span>
-                <input name="fullName" type="text" minlength="2" maxlength="120" autocomplete="name" required />
-              </label>
-              <label class="store-field">
-                <span>Email</span>
-                <input name="email" type="email" maxlength="254" autocomplete="email" required />
-              </label>
-              <label class="store-field">
-                <span>Password <small>(at least 8 characters)</small></span>
-                <input name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required />
-              </label>
-              <button class="store-button store-button-secondary" type="submit">Create account</button>
-              <p class="form-feedback" id="register-message" role="status" aria-live="polite"></p>
-            </form>
           </div>
 
           <section class="store-panel customer-dashboard" id="customer-dashboard" hidden aria-label="Customer dashboard">
@@ -405,6 +371,50 @@
           <p class="account-message" id="account-message" role="status" aria-live="polite"></p>
         </div>
       </section>
+
+      <dialog class="product-dialog auth-dialog" id="auth-dialog" aria-labelledby="auth-dialog-title">
+        <button class="dialog-close" type="button" data-close-auth aria-label="Close sign-in window">×</button>
+        <h3 id="auth-dialog-title" class="auth-dialog-title">Welcome to DigiCha</h3>
+        <p class="auth-dialog-note" id="auth-dialog-note" role="status" aria-live="polite"></p>
+        <div class="auth-tabs" role="tablist" aria-label="Sign in or create an account">
+          <button class="auth-tab is-active" id="auth-tab-login" type="button" role="tab" aria-selected="true" data-auth-tab="login-form">Log In</button>
+          <button class="auth-tab" id="auth-tab-register" type="button" role="tab" aria-selected="false" data-auth-tab="register-form">Create Account</button>
+        </div>
+        <div id="account-forms" class="auth-dialog-forms">
+            <form class="store-panel account-form" id="login-form">
+              <span class="account-form-label">Welcome back</span>
+              <h3>Sign in</h3>
+              <label class="store-field">
+                <span>Email</span>
+                <input name="email" type="email" maxlength="254" autocomplete="email" required />
+              </label>
+              <label class="store-field">
+                <span>Password</span>
+                <input name="password" type="password" minlength="8" maxlength="128" autocomplete="current-password" required />
+              </label>
+              <button class="store-button store-button-primary" type="submit">Sign in</button>
+              <p class="form-feedback" id="login-message" role="status" aria-live="polite"></p>
+            </form>
+            <form class="store-panel account-form" id="register-form">
+              <span class="account-form-label">First time here?</span>
+              <h3>Create an account</h3>
+              <label class="store-field">
+                <span>Full name</span>
+                <input name="fullName" type="text" minlength="2" maxlength="120" autocomplete="name" required />
+              </label>
+              <label class="store-field">
+                <span>Email</span>
+                <input name="email" type="email" maxlength="254" autocomplete="email" required />
+              </label>
+              <label class="store-field">
+                <span>Password <small>(at least 8 characters)</small></span>
+                <input name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required />
+              </label>
+              <button class="store-button store-button-secondary" type="submit">Create account</button>
+              <p class="form-feedback" id="register-message" role="status" aria-live="polite"></p>
+            </form>
+        </div>
+      </dialog>
 
       <dialog class="product-dialog" id="product-dialog" aria-labelledby="product-dialog-title">
         <button class="dialog-close" type="button" data-close-product aria-label="Close product details">×</button>

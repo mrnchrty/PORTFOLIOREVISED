@@ -29,6 +29,8 @@
       accountMessage: $('account-message'),
       accountSessionLabel: $('account-session-label'),
       backendStatus: document.querySelector('[data-backend-status]'),
+      authDialog: $('auth-dialog'),
+      authDialogNote: $('auth-dialog-note'),
       headerAuthGuest: $('header-auth-guest'),
       headerAccountMenu: $('header-account-menu'),
       headerAccountToggle: $('header-account-toggle'),
@@ -846,6 +848,8 @@
           : 'Account';
       }
       if (!signedIn) closeHeaderAccountMenu();
+      document.querySelectorAll('[data-auth-only]').forEach((section) => { section.hidden = !signedIn; });
+      if (signedIn) closeAuthDialog();
       if (elements.dashboardWelcome) elements.dashboardWelcome.textContent = `Welcome${profile?.full_name ? `, ${profile.full_name}` : ''}`;
       if (elements.dashboardEmail) elements.dashboardEmail.textContent = currentUser?.email || '';
       if (signedIn && elements.checkoutName && !elements.checkoutName.value) {
@@ -990,6 +994,42 @@
       } finally {
         setButtonBusy(button, false, '', 'Save account details');
       }
+    }
+
+    function switchAuthTab(formId) {
+      document.querySelectorAll('[data-auth-tab]').forEach((tab) => {
+        const active = tab.dataset.authTab === formId;
+        tab.classList.toggle('is-active', active);
+        tab.setAttribute('aria-selected', String(active));
+      });
+      for (const id of ['login-form', 'register-form']) {
+        const form = $(id);
+        if (form) form.hidden = id !== formId;
+      }
+    }
+
+    function openAuthDialog(formId = 'login-form', note = '') {
+      if (!elements.authDialog) {
+        // no dialog on this page: fall back to scrolling to the forms
+        $(formId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      switchAuthTab(formId);
+      if (elements.authDialogNote) {
+        elements.authDialogNote.textContent = note;
+        elements.authDialogNote.hidden = !note;
+      }
+      if (!elements.authDialog.open) {
+        if (typeof elements.authDialog.showModal === 'function') elements.authDialog.showModal();
+        else elements.authDialog.setAttribute('open', '');
+      }
+      $(formId)?.querySelector('input')?.focus({ preventScroll: true });
+    }
+
+    function closeAuthDialog() {
+      if (!elements.authDialog) return;
+      if (typeof elements.authDialog.close === 'function') elements.authDialog.close();
+      else elements.authDialog.removeAttribute('open');
     }
 
     function openHeaderAccountMenu() {
@@ -1277,13 +1317,7 @@
       if (!currentUser && elements.loginForm) {
         pendingCartIntent = { productId: String(product.id), options };
         closeProductDialog();
-        setMessage(
-          elements.accountMessage,
-          'Log in or create an account to add items to your cart. We will bring you back to this product.',
-          'info',
-        );
-        elements.loginForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        elements.loginForm.querySelector('input')?.focus({ preventScroll: true });
+        openAuthDialog('login-form', 'Log in to continue — we will add this item to your cart right after.');
         return;
       }
       const candidate = { productId: String(product.id), quantity: 1, options };
@@ -1753,17 +1787,35 @@
       });
       document.querySelectorAll('[data-auth-jump]').forEach((link) => {
         link.addEventListener('click', (event) => {
-          const form = $(link.dataset.authJump);
-          if (!form) return;
           event.preventDefault();
           closeMobileMenu();
-          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          form.querySelector('input')?.focus({ preventScroll: true });
+          openAuthDialog(link.dataset.authJump);
         });
       });
+      document.querySelectorAll('[data-auth-tab]').forEach((tab) => {
+        tab.addEventListener('click', () => switchAuthTab(tab.dataset.authTab));
+      });
+      elements.authDialog?.querySelector('[data-close-auth]')?.addEventListener('click', closeAuthDialog);
+      elements.authDialog?.addEventListener('click', (event) => {
+        if (event.target === elements.authDialog) closeAuthDialog();
+      });
+      // Signed-out visitors: cart / account links open the sign-in window
+      document.querySelectorAll('.store-cart-link, a[href="#account"]:not([data-auth-jump]), a[href="#cart"]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          if (currentUser || !elements.authDialog) return;
+          event.preventDefault();
+          closeMobileMenu();
+          openAuthDialog('login-form', 'Log in to continue.');
+        });
+      });
+      if (elements.authDialog) switchAuthTab('login-form');
 
       document.querySelectorAll('[data-scroll-to]').forEach((button) => {
         button.addEventListener('click', () => {
+          if (button.dataset.scrollTo === 'account' && !currentUser && elements.authDialog) {
+            openAuthDialog('login-form');
+            return;
+          }
           const target = $(button.dataset.scrollTo);
           target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });

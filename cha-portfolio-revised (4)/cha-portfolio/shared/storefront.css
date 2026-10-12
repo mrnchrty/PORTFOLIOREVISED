@@ -1915,3 +1915,70 @@ body.storefront [hidden] {
     max-width: 150px;
   }
 }
+
+/* --- Sign-in / create-account modal --- */
+.auth-dialog {
+  width: min(94vw, 440px);
+  max-width: 440px;
+}
+
+.auth-dialog-title {
+  margin: 2px 26px 4px 0;
+  font-size: 1.22rem;
+}
+
+.auth-dialog-note {
+  margin: 0 0 10px;
+  padding: 9px 12px;
+  border: 1px solid rgba(214, 120, 147, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 228, 238, 0.55);
+  color: #a3415f;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.auth-dialog-note[hidden] {
+  display: none;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-bottom: 14px;
+  padding: 5px;
+  border: 1px solid var(--shop-line);
+  border-radius: 999px;
+  background: rgba(79, 63, 123, 0.05);
+}
+
+.auth-tab {
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--shop-muted);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-tab.is-active {
+  background: #fff;
+  color: var(--shop-ink);
+  box-shadow: 0 6px 16px rgba(79, 63, 123, 0.16);
+}
+
+.auth-dialog-forms .account-form {
+  width: 100%;
+  border: 0;
+  padding: 4px 2px 0;
+  background: none;
+  box-shadow: none;
+}
+
+.auth-dialog-forms .account-form[hidden] {
+  display: none;
+}
