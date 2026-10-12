@@ -208,7 +208,6 @@
   display: block;
   width: 100%;
   height: auto; /* keeps the image's own aspect ratio */
-  margin-top: 6px;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.75);
   box-shadow: 0 20px 46px rgba(79, 63, 123, 0.18);
@@ -227,9 +226,11 @@
   margin-bottom: 0;
 }
 
-.shop-unified-brand h2 {
+.shop-unified-brand h1 {
   margin: 0;
-  font-size: clamp(1.6rem, 3.4vw, 2.1rem);
+  color: inherit;
+  font-size: clamp(1.7rem, 3.6vw, 2.2rem);
+  letter-spacing: -0.02em;
 }
 
 .shop-unified-brand p {
