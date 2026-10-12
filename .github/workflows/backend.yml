@@ -1,0 +1,35 @@
+name: Backend checks
+
+on:
+  push:
+    branches: ['main', 'arena/**']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  test:
+    name: Syntax, unit tests, and the integration loop
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 'cha-portfolio-revised (4)/cha-portfolio/backend'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 'cha-portfolio-revised (4)/cha-portfolio/backend/package-lock.json'
+
+      - name: Install from the tracked lockfile
+        run: npm ci
+
+      - name: Syntax-check every script (backend and frontend)
+        run: npm run check
+
+      - name: Unit tests (no servers)
+        run: npm test
+
+      - name: Integration loop against the stand-in database
+        run: npm run test:integration
