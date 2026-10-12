@@ -75,9 +75,15 @@ function jsonResponse(body) {
   };
 }
 
-function signedInFetch() {
-  return async (url) => {
+function signedInFetch(state) {
+  return async (url, options = {}) => {
     const target = String(url);
+    if (target.includes('/auth/profile')) {
+      const body = JSON.parse(options.body || '{}');
+      state.profilePatch = body;
+      const updated = { full_name: body.fullName, phone: body.phone || '', avatar_url: body.avatarUrl || '' };
+      return jsonResponse({ profile: updated, message: 'Account information updated.' });
+    }
     if (target.includes('/api/health')) {
       return jsonResponse({
         status: 'ok',
@@ -92,12 +98,16 @@ function signedInFetch() {
           email: 'cha@example.com',
           user_metadata: { avatar_url: 'https://cdn.example.com/cha-photo.png' },
         },
-        profile: { full_name: 'Maroine Charity De Roy', phone: '0917 000 0000' },
+        profile: { full_name: 'Maroine Charity De Roy', phone: '0917 000 0000', avatar_url: 'https://cdn.example.com/cha-photo.png' },
         staff_memberships: [],
       });
     }
     if (target.includes('/dashboard')) {
-      return jsonResponse({ profile: { full_name: 'Maroine Charity De Roy', phone: '' }, orders: [], deals: [] });
+      return jsonResponse({
+        profile: { full_name: 'Maroine Charity De Roy', phone: '', avatar_url: 'https://cdn.example.com/cha-photo.png' },
+        orders: [],
+        deals: [],
+      });
     }
     if (target.includes('/checkout')) return jsonResponse({ shop: { fulfillment_options: [] }, payment_methods: [] });
     if (target.includes('/deals')) return jsonResponse({ deals: [] });
@@ -124,6 +134,7 @@ function waitFor(read, timeout = 10000) {
 }
 
 async function openShop(page, { signedIn = false } = {}) {
+  const state = { profilePatch: null };
   const errors = [];
   const virtualConsole = new VirtualConsole();
   virtualConsole.on('jsdomError', (error) => errors.push(error.message));
@@ -135,7 +146,7 @@ async function openShop(page, { signedIn = false } = {}) {
     beforeParse(window) {
       // jsdom has no layout engine, so this browser API is missing.
       window.Element.prototype.scrollIntoView = () => {};
-      if (signedIn) window.fetch = signedInFetch();
+      if (signedIn) window.fetch = signedInFetch(state);
     },
   });
   const { document } = dom.window;
@@ -147,7 +158,7 @@ async function openShop(page, { signedIn = false } = {}) {
     // Let the failed /auth/me request settle so the signed-out state is final.
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
-  return { dom, document, errors };
+  return { dom, document, errors, state };
 }
 
 for (const shop of SHOPS) {
@@ -213,6 +224,24 @@ for (const shop of SHOPS) {
     assert.equal(document.querySelector('[data-dashboard-avatar]').getAttribute('src'), 'https://cdn.example.com/cha-photo.png');
     assert.match(document.querySelector('#dashboard-welcome').textContent, /Maroine Charity De Roy/);
     assert.equal(document.querySelector('#account-session-label').textContent, 'cha@example.com');
+    dom.window.close();
+  });
+
+  test(`${shop.label} saves a profile photo link and updates the account image`, async (t) => {
+    if (!JSDOM) return t.skip('jsdom is not installed (run npm install in backend/)');
+    const { dom, document, state } = await openShop(shop.page, { signedIn: true });
+    const form = document.querySelector('#profile-form');
+
+    assert.equal(form.elements.avatarUrl.value, 'https://cdn.example.com/cha-photo.png');
+    assert.equal(form.elements.avatarUrl.type, 'url', 'the browser validates the link format');
+
+    form.elements.avatarUrl.value = 'https://cdn.example.com/new-photo.png';
+    form.dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+    await waitFor(() => document.querySelector('#store-account-avatar').getAttribute('src') === 'https://cdn.example.com/new-photo.png');
+
+    assert.equal(state.profilePatch.avatarUrl, 'https://cdn.example.com/new-photo.png');
+    assert.equal(document.querySelector('[data-dashboard-avatar]').getAttribute('src'), 'https://cdn.example.com/new-photo.png');
+    assert.equal(document.querySelector('#store-account-avatar').getAttribute('src'), 'https://cdn.example.com/new-photo.png');
     dom.window.close();
   });
 

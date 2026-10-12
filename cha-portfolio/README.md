@@ -50,6 +50,7 @@ Requirements: Node.js 18 or newer, npm, and either the shared Supabase project c
 4. In the Supabase project's SQL Editor:
    - For a new project, run `database/schema.sql`.
    - If this is an existing project created with the older schema in this package, back up the database, run `database/migrations/001_upgrade_existing_shop_schema.sql`, then run `database/schema.sql`.
+   - On a database created before profile photos were added, also run `database/migrations/002_add_profile_avatar.sql` (it only adds the `profiles.avatar_url` column and is safe to re-run).
    - For the shared project, run `database/seed.sql`.
    - For separate projects, run `database/seed-digicha.sql` in DigiCha and `database/seed-mochajaki.sql` in Mochajaki.
 5. If using separate projects, repeat step 4 in the Mochajaki Supabase project. Do not run `seed.sql` in that setup.

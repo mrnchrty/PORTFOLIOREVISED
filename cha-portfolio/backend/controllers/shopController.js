@@ -327,7 +327,7 @@ async function getCustomerDashboard(request, response, next) {
     const [profileResult, ordersResult, deals] = await Promise.all([
       db
         .from('profiles')
-        .select('id, full_name, phone, created_at, updated_at')
+        .select('id, full_name, phone, avatar_url, created_at, updated_at')
         .eq('id', request.user.id)
         .maybeSingle(),
       db

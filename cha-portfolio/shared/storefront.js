@@ -757,6 +757,7 @@
         if (elements.profileForm && profile) {
           elements.profileForm.elements.fullName.value = profile.full_name || '';
           elements.profileForm.elements.phone.value = profile.phone || '';
+          elements.profileForm.elements.avatarUrl.value = profile.avatar_url || '';
         }
         elements.customerOrders.innerHTML = result.orders?.length
           ? result.orders.map(renderOrder).join('')
@@ -835,6 +836,7 @@
       if (elements.profileForm && profile) {
         elements.profileForm.elements.fullName.value = profile.full_name || '';
         elements.profileForm.elements.phone.value = profile.phone || '';
+        elements.profileForm.elements.avatarUrl.value = profile.avatar_url || '';
       }
       updateAdminLink();
       if (signedIn) loadDashboard();
@@ -956,9 +958,14 @@
       try {
         const result = await api.requestJson(authEndpoint('/profile'), {
           method: 'PATCH',
-          body: { fullName: formData.get('fullName'), phone: formData.get('phone') || '' },
+          body: {
+            fullName: formData.get('fullName'),
+            phone: formData.get('phone') || '',
+            avatarUrl: formData.get('avatarUrl') || '',
+          },
         });
         profile = result.profile || profile;
+        renderAccountHeader(Boolean(currentUser));
         if (elements.dashboardWelcome) elements.dashboardWelcome.textContent = `Welcome, ${profile?.full_name || currentUser?.email || ''}`;
         setMessage(elements.profileMessage, result.message || 'Account information updated.', 'success');
       } catch (error) {

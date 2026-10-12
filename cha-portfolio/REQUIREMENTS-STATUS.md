@@ -6,6 +6,9 @@ This document distinguishes verified changes from requested work that has not be
 - `portfolio/about/index.html`, `style.css`, `script.js` and `portfolio/resume/index.html`, `style.css`, `script.js` are separate editable pages.
 - Fixed `backend/package.json`'s `npm run check` command, which incorrectly referenced the deleted `portfolio/about/about.js`. `npm run check` now exits successfully.
 
+- Profile photos are a stored **link** (`profiles.avatar_url`, added by `database/migrations/002_add_profile_avatar.sql`), not an upload: an existing database must run that migration, or the account endpoints will not find the column. No image file reaches this server.
+
+## Verified in the shop account area
 - Storefront headers use a single account entry point (Log In | Create Account, then the account image with My Account), and owner-directed instruction text was removed from the visitor-facing shop copy. `backend/tests/storefront-account.test.js` covers both states with a stubbed session; the signed-in state has still **not** been exercised against a live Supabase project.
 
 ## Outstanding / not verified

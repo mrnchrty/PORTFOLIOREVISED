@@ -378,6 +378,17 @@
                   <span>Contact number</span>
                   <input name="phone" type="tel" maxlength="40" />
                 </label>
+                <label class="store-field full-field">
+                  <span>Profile photo link <small>(https:// link to an image)</small></span>
+                  <input
+                    name="avatarUrl"
+                    type="url"
+                    maxlength="500"
+                    inputmode="url"
+                    autocomplete="url"
+                    placeholder="https://example.com/your-photo.jpg"
+                  />
+                </label>
                 <button class="store-button store-button-secondary" type="submit">Save account details</button>
               </div>
               <p class="form-feedback" id="profile-message" role="status" aria-live="polite"></p>
