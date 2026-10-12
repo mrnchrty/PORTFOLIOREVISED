@@ -9,6 +9,7 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shops');
 const { stripeWebhook } = require('./controllers/paymentController');
 const { errorHandler, notFound } = require('./middleware/errors');
+const { requireSameOriginForMutations } = require('./middleware/same-origin');
 const {
   missingSupabaseSettings,
   sampleOrdersAreAllowed,
@@ -53,43 +54,6 @@ app.post(
 );
 
 app.use(express.json({ limit: '50kb' }));
-
-function requireSameOriginForMutations(request, response, next) {
-  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) return next();
-
-  const origin = request.get('origin');
-  if (!origin) {
-    return response.status(403).json({ error: 'This request needs a same-origin browser session.' });
-  }
-
-  let originUrl;
-  try {
-    originUrl = new URL(origin);
-  } catch {
-    return response.status(403).json({ error: 'Request origin is not valid.' });
-  }
-
-  const requestHost = request.get('host');
-  const requestProtocol = request.protocol;
-  const sameRequestOrigin =
-    originUrl.host.toLowerCase() === String(requestHost || '').toLowerCase() &&
-    originUrl.protocol === `${requestProtocol}:`;
-
-  let configuredOrigin = false;
-  if (process.env.FRONTEND_ORIGIN) {
-    try {
-      configuredOrigin = originUrl.origin === new URL(process.env.FRONTEND_ORIGIN).origin;
-    } catch {
-      configuredOrigin = false;
-    }
-  }
-
-  if (!sameRequestOrigin && !configuredOrigin) {
-    return response.status(403).json({ error: 'Cross-origin requests are not allowed.' });
-  }
-
-  next();
-}
 
 app.use('/api', requireSameOriginForMutations);
 
