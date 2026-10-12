@@ -1985,12 +1985,8 @@ body.storefront [hidden] {
 
 /* --- DigiCha pencil brand icon (from the DIGICHA Creative Solutions logo) --- */
 .store-brand-pencil {
-  background: #121014;
-  border-color: rgba(236, 30, 150, 0.55);
-}
-
-.store-brand-pencil img {
   display: block;
-  width: 64%;
-  height: 64%;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
 }
