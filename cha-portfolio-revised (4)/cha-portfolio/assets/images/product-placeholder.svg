@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="620" viewBox="0 0 900 620" role="img" aria-label="DigiCha product illustration">
+  <rect width="900" height="620" fill="#f8f7fb" />
+  <rect x="28" y="28" width="844" height="564" rx="18" fill="none" stroke="#d7cce8" stroke-width="3" />
+  <rect x="275" y="150" width="350" height="250" rx="26" fill="#fff" stroke="#9f77c4" stroke-width="5"/>
+  <path d="M330 350 L405 275 L470 325 L535 235 L575 350Z" fill="#9f77c4" opacity=".55"/>
+  <circle cx="375" cy="220" r="28" fill="#f0bd70"/>
+  <text x="450" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="600" fill="#56536b">DigiCha custom goods</text>
+</svg>

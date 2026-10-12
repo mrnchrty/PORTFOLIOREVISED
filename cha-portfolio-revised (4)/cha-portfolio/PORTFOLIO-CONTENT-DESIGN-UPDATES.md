@@ -1,0 +1,43 @@
+# Portfolio Content and Design Updates
+
+## Applied in this revision
+- Reworked About Me with a clear personal narrative and a five-image gallery.
+- Each About Me image is replaceable by editing the `src` attribute in `portfolio/about/index.html`.
+- Reworked Resume into a formal, readable page with a photo at the top-left, the requested name arrangement, career objectives, education, core skills, technical skills, certifications/trainings, project experience, leadership, and creative skills.
+- Removed the “Aspiring Business Analyst” title and removed that phrase from the career objective. Business Analytics remains as the user's academic specialization.
+- Matched About Me and Resume to the homepage's existing palette, glassmorphism, gradients, rounded surfaces, and typography.
+- Divided the resume into boxed sections (`.resume-grid` / `.resume-card` in `portfolio/resume/style.css`): Career Objectives and Education span the full width, the remaining sections sit two per row as rounded glass panels, and the whole grid collapses to one column on narrow screens. No resume content was removed and no colour or theme value was changed.
+- Removed the Print / Save as PDF button from the resume footer note, since the printed/PDF export is no longer offered.
+- Masthead clean-up: the name now sits on a single line (`DE ROY, MAROINE CHARITY R.`) instead of three stacked lines; the “CURRICULUM VITAE” kicker, the photo caption, and the final references note were removed. The name is kept in separate `<span>`s with spaces so it still copies as one line, and flex `wrap` lets it fall to two lines on phones rather than overflowing.
+- Applied the supplied resume content: the section is now **Educational Background** (college marked “Currently studying”, Senior High School 2022–2024, High School 2019–2021 at Anselmo A. Sandoval Memorial National High School, and High School 2018–2019 at Bagong Silangan High School with With Honors), **Certifications & Achievements** (Computer System Servicing NC II — TESDA, May 6, 2024; Augnayan Photo Essay — 3rd Place, September 1, 2025), **Leadership Positions & Organization Positions** (Committee Chairperson for Digital Graphics 2026–2027; Technical Committee Member — Graphics 2025–2026 and 2026–2027), and a new **Tech Stack** section.
+- The Tech Stack renders the ten requested tools (nine plus VS Code, added later) as real local SVG marks (`.tech-chip` in `portfolio/resume/style.css`) pulled from `assets/icons/`: Canva, Word, PowerPoint, Excel, HTML, JavaScript, Python, C++, and CSS. Existing icons were reused; no new asset files were added.
+- The Tech Stack is grouped into two labelled rows (`.tech-group`): **Productivity & Creative Tools** (Canva, Word, PowerPoint, Excel) and **Programming & Web** (HTML, JavaScript, Python, C++, CSS). Each group lays its icons out with `auto-fit`, so all four and all five icons sit on a single row at every width from 1440px down to 920px.
+- Dean's List is listed for 2024–2025 and 2025–2026 in the Educational Background entry.
+- Removed the **Career Objectives**, **Technical Skills**, **Project Experience**, and **Creative & Other Relevant Skills** sections at the user's request (Project Experience was later restored as a full-width panel — see below). Educational Background took over the accent panel at the top, and the resume now runs 01–05: Educational Background, Core Skills, Tech Stack, Certifications & Achievements, Leadership Positions & Organization Positions.
+- The resume masthead carries a contact block: the supplied address, phone number, and email, each with a circular icon, plus the supplied Facebook and LinkedIn names. The phone and email rows are live `tel:` and `mailto:` links.
+- The line under the name reads “BS INFORMATION TECHNOLOGY STUDENT” and the meta line keeps only “Student Leader · Creative Designer”, since the address now appears in the contact block.
+- All five contact icons use the theme accent `#8741a3`. The GitHub and LinkedIn marks were re-cut as `contact-github.svg` / `contact-linkedin.svg` from the local Bootstrap sources so they share the same 16x16 viewBox as the other three; `.contact-mark` trims their padding slightly because a solid mark carries more ink than line art at the same box size. The first social row is GitHub, not Facebook. Verified in the browser: one rendered colour across all five, and comparable ink (10.5-14px against a 30px chip).
+- The resume contact rows are live links: `tel:`, `mailto:`, GitHub `https://github.com/mrnchrty`, and LinkedIn `https://www.linkedin.com/in/maroine-charity-de-roy-2b86492a9/`. External links open in a new tab with `rel="noopener noreferrer"`, and all links underline in the accent colour on hover.
+- Confirm the LinkedIn slug before publishing: the link text supplied was `maroine-charity-de-roy-2b86492a` while the link target was `maroine-charity-de-roy-2b86492a9`. The longer form from the link target is in use, and the `?isSelfProfile=true` marker was dropped as it is a self-view flag, not part of the public URL.
+- Core Skills uses an icon per skill (`.skill-icon`) instead of the decorative star.
+- Section headings use an icon instead of the numbered badge (`.section-icon`): mortarboard for Educational Background, stars for Core Skills, code brackets for Tech Stack, briefcase for Project Experience, award for Certifications & Achievements, and person badge for Leadership.
+- Core Skills icons sit in the same circular gradient chip as the contact icons (`.skill-icon`), so the two blocks share one visual language.
+- Leadership is laid out as a marked rail (`.leadership-timeline`): the role in accent pink, the organisation below it, then the date, joined by a vertical line with a dot per role.
+- Tech Stack gains a VS Code chip, bringing Programming & Web to six icons.
+- Project Experience keeps MediTrack and E-Gasang only; the placeholder “Additional Academic Systems” entry was removed. E-Gasang is titled “E-Gasang — Integrated Barangay Information and Management System”, tagged Academic Project, and carries the supplied summary plus three bullets (centralized resident database, online document requests with status tracking and notifications, and announcements/monitoring dashboards/report generation).
+- The Technical Committee leadership entry reads “Graphics” over “Technical Committee” with 2025–2026 and 2026–2027 on separate lines.
+- Project Experience is restored as a full-width panel (section 04) between Tech Stack and Certifications & Achievements.
+- Contrast pass on the resume text (WCAG AA, measured against the rendered card backgrounds rather than the CSS values): the leadership role colour moved from `#b64eb9` to `#a544b2` (4.06:1 → 4.76:1), the leadership and timeline date colour from `#85809c` to `#6d6a86` (3.52:1 → 4.77:1), and the resume meta line from `#74758d` to `#6d6a86` (4.09:1 → 4.71:1). Every remaining text colour on the page already passed, so no other value changed; the hues are the theme's own darker tones, so the palette still reads the same.
+- Kept personal information grounded in the supplied portfolio context. Items whose exact dates/title may need confirmation are noted in the resume rather than presented as verified specifics.
+
+## Replacing About Me pictures
+Open `portfolio/about/index.html` and replace the `src` value on the five `<figure class="photo-tile ...">` images. The main portrait is a separate image near the top of the page. Use image files placed in `assets/images/`, for example `../../assets/images/my-photo.jpg` from the About Me page.
+
+## Replacing the formal resume photo
+The visible “Replace with formal photo” caption was removed at the user's request, so this note is now the only reminder: open `portfolio/resume/index.html` and replace the `src` value for `.resume-photo` with your formal headshot. The current file is a placeholder illustration, not a real photo.
+
+## Content to confirm before final submission
+- Confirm the expected college completion year. The Dean's List entry now uses the supplied 2024–2025 and 2025–2026 terms, and the Career Objectives paragraph was removed, so its text is no longer part of the page.
+- Confirm the exact titles/dates for the two “Certificate of Participation” entries (AscendIT: The Step Up Legacy; Trick or Tech: The AI Dilemma) — the supplied list covers the NC II and Augnayan dates only.
+- Confirm the exact role dates/titles for each organization entry. Project Experience is live again with the MediTrack and E-Gasang write-ups, so confirm both summaries still match the finished systems.
+- The Tech Stack icons label Canva and the Microsoft tools by product name only; they are existing local marks reused from `assets/icons/`, not new trademarked artwork.

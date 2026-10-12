@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="620" viewBox="0 0 900 620" role="img" aria-label="Mochajaki food illustration">
+  <rect width="900" height="620" fill="#f8f7fb" />
+  <rect x="28" y="28" width="844" height="564" rx="18" fill="none" stroke="#ead4bd" stroke-width="3" />
+  <ellipse cx="450" cy="360" rx="185" ry="70" fill="#d99357" opacity=".72"/>
+  <path d="M300 350 Q450 230 600 350 Q575 455 450 465 Q325 455 300 350Z" fill="#fff3df" stroke="#c67d4b" stroke-width="6"/>
+  <path d="M350 350 Q450 285 550 350" fill="none" stroke="#d99357" stroke-width="10" stroke-linecap="round"/>
+  <text x="450" y="520" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="600" fill="#56536b">Mochajaki menu</text>
+</svg>

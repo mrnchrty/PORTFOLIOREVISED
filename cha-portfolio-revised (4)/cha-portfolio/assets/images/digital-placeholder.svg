@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="620" viewBox="0 0 900 620" role="img" aria-label="Product image slot">
+  <rect width="900" height="620" fill="#f8f7fb" />
+  <rect x="28" y="28" width="844" height="564" rx="18" fill="none" stroke="#b8b4c8" stroke-width="3" stroke-dasharray="12 12" />
+  <rect x="270" y="150" width="360" height="260" rx="28" fill="#fff" stroke="#8c80b8" stroke-width="4"/>
+  <path d="M320 350 L400 260 L470 320 L540 220 L590 350Z" fill="#8c80b8" opacity=".58"/>
+  <circle cx="385" cy="220" r="30" fill="#e8b4cf"/>
+  <text x="450" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="600" fill="#56536b">Digital goods</text>
+</svg>
