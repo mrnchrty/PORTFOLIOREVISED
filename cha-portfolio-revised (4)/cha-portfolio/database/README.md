@@ -73,7 +73,9 @@ ALLOW_SAMPLE_ORDERS=true npm start    # terminal 2 — the real API, against the
 ```
 
 Then open the storefront, sign in with `owner@example.com` and any password, add the
-`TEST-DB` products to the cart and place an order. It exercises the real catalog, sign-in, quote,
+`TEST-DB` products to the cart and place an order. The dataset also seeds the `LAUNCH10`
+promotion (10% off the order), so the deals section and the promo-code field can be exercised;
+the stand-in's quote and order calls mirror `quote_shop_cart`'s discount rules. It exercises the real catalog, sign-in, quote,
 order and dashboard code paths; the stand-in data resets when it restarts.
 
 It is a development aid, not part of the product: it is not started by `npm start`, not run by

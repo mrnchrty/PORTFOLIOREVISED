@@ -94,7 +94,27 @@ const tables = {
   }],
   categories: [{ id: CATEGORY_ID, shop_id: SHOP_ID, name: 'Stickers', slug: 'stickers', sort_order: 1, is_active: true, created_at: iso() }],
   products: PRODUCTS,
-  promotions: [],
+  promotions: [{
+    id: '55555555-5555-4555-8555-555555555555',
+    shop_id: SHOP_ID,
+    code: 'LAUNCH10',
+    name: 'Launch promo',
+    description: '10% off the whole order while testing.',
+    discount_type: 'percent',
+    discount_value: 10,
+    applies_to: 'order',
+    product_id: null,
+    category_id: null,
+    minimum_order_total: 0,
+    maximum_discount: null,
+    maximum_redemptions: null,
+    maximum_redemptions_per_customer: null,
+    starts_at: new Date(Date.now() - 86400000).toISOString(),
+    ends_at: null,
+    is_active: true,
+    created_at: iso(),
+    updated_at: iso(),
+  }],
   profiles: [{ id: USER_ID, full_name: 'Test Owner', phone: '0900 000 0000', created_at: iso(), updated_at: iso() }],
   staff_members: [{ id: '44444444-4444-4444-8444-444444444444', user_id: USER_ID, shop_id: SHOP_ID, role: 'admin', is_active: true, created_at: iso() }],
   orders: [],
@@ -140,6 +160,12 @@ function applyFilters(rows, params) {
     } else if (value.startsWith('in.(')) {
       const wants = value.slice(4, -1).split(',').map((v) => v.trim().replace(/^"|"$/g, ''));
       out = out.filter((row) => wants.includes(String(row[key])));
+    } else if (value.startsWith('lte.')) {
+      const want = value.slice(4);
+      out = out.filter((row) => String(row[key] ?? '') <= want);
+    } else if (value.startsWith('gte.')) {
+      const want = value.slice(4);
+      out = out.filter((row) => String(row[key] ?? '') >= want);
     } else if (value.startsWith('is.')) {
       const want = value.slice(3).toLowerCase();
       out = out.filter((row) => (
@@ -187,36 +213,76 @@ function unitPrice(product, options) {
   return price;
 }
 
-function quote(body) {
-  let subtotal = 0;
-  for (const item of body.p_items || []) {
+// Mirrors the discount rules in quote_shop_cart(): an active promotion within its date window,
+// meeting minimum_order_total, applied to the eligible slice (order / product / category),
+// percent or fixed, capped by maximum_discount and the eligible amount.
+function applyPromotion(code, items, subtotal) {
+  const wanted = String(code || '').trim().toUpperCase();
+  if (!wanted) return { discount: 0, promotion: null };
+  const nowIso = iso();
+  const promotion = tables.promotions.find((p) => (
+    String(p.code || '').toUpperCase() === wanted
+    && p.is_active
+    && String(p.starts_at) <= nowIso
+    && (!p.ends_at || String(p.ends_at) > nowIso)
+    && Number(p.minimum_order_total || 0) <= subtotal
+  ));
+  if (!promotion) return { discount: 0, promotion: null };
+
+  let eligible = subtotal;
+  if (promotion.applies_to !== 'order') {
+    eligible = 0;
+    for (const { product, quantity, unit } of items) {
+      if ((promotion.applies_to === 'product' && product.id === promotion.product_id)
+        || (promotion.applies_to === 'category' && product.category_id === promotion.category_id)) {
+        eligible += Math.round(unit * quantity * 100) / 100;
+      }
+    }
+  }
+
+  let discount = promotion.discount_type === 'percent'
+    ? Math.round(eligible * Number(promotion.discount_value) / 100 * 100) / 100
+    : Math.min(eligible, Number(promotion.discount_value));
+  if (promotion.maximum_discount !== null && promotion.maximum_discount !== undefined) {
+    discount = Math.min(discount, Number(promotion.maximum_discount));
+  }
+  discount = Math.min(discount, eligible, subtotal);
+  return { discount, promotion };
+}
+
+function cartLines(rawItems) {
+  const lines = [];
+  for (const item of rawItems || []) {
     const product = tables.products.find((p) => String(p.id) === String(item.productId || item.product_id));
     if (!product) continue;
-    subtotal += unitPrice(product, item.options || item.selectedOptions || item.selected_options) * Number(item.quantity || 0);
+    const unit = unitPrice(product, item.options || item.selectedOptions || item.selected_options);
+    lines.push({ product, quantity: Number(item.quantity || 0), unit });
   }
+  return lines;
+}
+
+function quote(body) {
+  const lines = cartLines(body.p_items);
+  let subtotal = 0;
+  for (const line of lines) subtotal += line.unit * line.quantity;
   subtotal = Math.round(subtotal * 100) / 100;
+  const { discount, promotion } = applyPromotion(body.p_promo_code, lines, subtotal);
   return [{
     quote_subtotal: subtotal,
-    quote_discount: 0,
-    quote_total: subtotal,
-    applied_promotion_id: null,
-    applied_promotion_name: null,
-    applied_coupon_code: null,
+    quote_discount: discount,
+    quote_total: Math.round((subtotal - discount) * 100) / 100,
+    applied_promotion_id: promotion ? promotion.id : null,
+    applied_promotion_name: promotion ? promotion.name : null,
+    applied_coupon_code: promotion ? promotion.code : null,
   }];
 }
 
 function createOrder(body) {
+  const lines = cartLines(body.p_items);
   let subtotal = 0;
-  const lines = [];
-  for (const item of body.p_items || []) {
-    const product = tables.products.find((p) => String(p.id) === String(item.productId || item.product_id));
-    if (!product) continue;
-    const unit = unitPrice(product, item.options || {});
-    const quantity = Number(item.quantity || 0);
-    subtotal += unit * quantity;
-    lines.push({ product, quantity, unit });
-  }
+  for (const line of lines) subtotal += line.unit * line.quantity;
   subtotal = Math.round(subtotal * 100) / 100;
+  const { discount, promotion } = applyPromotion(body.p_promo_code, lines, subtotal);
   const id = randomUUID();
   const orderNumber = `DC-${1000 + tables.orders.length + 1}`;
 
@@ -225,7 +291,8 @@ function createOrder(body) {
     customer_name: body.p_customer_name, customer_email: body.p_customer_email,
     customer_contact: body.p_customer_contact, fulfillment_method: body.p_fulfillment_method,
     fulfillment_details: body.p_fulfillment_details, payment_method: body.p_payment_method,
-    promo_code: body.p_promo_code, subtotal, discount: 0, total: subtotal, currency: 'PHP',
+    promo_code: body.p_promo_code, subtotal, discount,
+    total: Math.round((subtotal - discount) * 100) / 100, currency: 'PHP',
     status: 'pending', payment_status: 'unpaid', is_test_order: Boolean(body.p_allow_sample),
     created_at: iso(), updated_at: iso(),
   });
@@ -242,11 +309,11 @@ function createOrder(body) {
     created_order_id: id,
     created_order_number: orderNumber,
     created_subtotal: subtotal,
-    created_discount: 0,
-    created_total: subtotal,
+    created_discount: discount,
+    created_total: Math.round((subtotal - discount) * 100) / 100,
     created_status: 'pending',
     created_payment_status: 'unpaid',
-    created_promotion_name: null,
+    created_promotion_name: promotion ? promotion.name : null,
   }];
 }
 
