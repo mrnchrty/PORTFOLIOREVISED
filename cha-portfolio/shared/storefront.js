@@ -25,8 +25,11 @@
     const html = api.escapeHtml;
 
     const elements = {
+      accountAvatar: $('store-account-avatar'),
       accountForms: $('account-forms'),
       accountGateNote: $('account-gate-note'),
+      accountGuest: document.querySelector('[data-account-guest]'),
+      accountMember: document.querySelector('[data-account-member]'),
       accountMessage: $('account-message'),
       accountSessionLabel: $('account-session-label'),
       backendStatus: document.querySelector('[data-backend-status]'),
@@ -50,6 +53,7 @@
       customerDashboard: $('customer-dashboard'),
       customerOrders: $('customer-orders'),
       dashboardDeals: $('dashboard-deals'),
+      dashboardAvatar: document.querySelector('[data-dashboard-avatar]'),
       dashboardEmail: $('dashboard-email'),
       dashboardWelcome: $('dashboard-welcome'),
       dealsGrid: $('deals-grid'),
@@ -110,6 +114,7 @@
     let quoteRequestNumber = 0;
     let editingCartIndex = null;
     let shopHealthPromise;
+    let authMode = elements.accountForms?.dataset.authMode === 'register' ? 'register' : 'login';
 
     async function loadShopHealth() {
       if (!shopHealthPromise) {
@@ -349,7 +354,7 @@
     function renderCart() {
       if (!elements.cartItems) return;
       if (!cart.length) {
-        elements.cartItems.innerHTML = '<p class="store-empty">Your cart is empty. Browse the catalog above to add an item.</p>';
+        elements.cartItems.innerHTML = '<p class="store-empty">Your cart is empty. Add something from the catalog to get started.</p>';
       } else {
         elements.cartItems.innerHTML = cart.map(makeCartLine).join('') || '<p class="store-empty">Your cart is empty.</p>';
       }
@@ -680,7 +685,7 @@
               </article>
             `;
           }).join('')
-        : '<p class="store-empty">No active offers are configured for this shop. Add real promotion rules and dates in the admin panel when ready.</p>';
+        : '<p class="store-empty">No offers are running right now.</p>';
 
       if (elements.dealsGrid) elements.dealsGrid.innerHTML = content;
       if (elements.dashboardDeals) {
@@ -752,6 +757,7 @@
         if (elements.profileForm && profile) {
           elements.profileForm.elements.fullName.value = profile.full_name || '';
           elements.profileForm.elements.phone.value = profile.phone || '';
+          elements.profileForm.elements.avatarUrl.value = profile.avatar_url || '';
         }
         elements.customerOrders.innerHTML = result.orders?.length
           ? result.orders.map(renderOrder).join('')
@@ -775,22 +781,50 @@
       link.hidden = false;
     }
 
+    function setAuthMode(mode) {
+      authMode = mode === 'register' ? 'register' : 'login';
+      if (elements.accountForms) elements.accountForms.dataset.authMode = authMode;
+      if (elements.loginForm) elements.loginForm.hidden = authMode !== 'login';
+      if (elements.registerForm) elements.registerForm.hidden = authMode !== 'register';
+    }
+
+    function profileImageSource() {
+      const candidates = [
+        profile?.avatar_url,
+        currentUser?.user_metadata?.avatar_url,
+        currentUser?.user_metadata?.picture,
+      ];
+      const found = candidates.find((value) => typeof value === 'string' && value.trim() !== '');
+      return api.safeImageUrl(found, '../assets/images/account-avatar-default.svg');
+    }
+
+    function renderAccountHeader(signedIn) {
+      if (elements.accountGuest) elements.accountGuest.hidden = signedIn;
+      if (elements.accountMember) {
+        elements.accountMember.hidden = !signedIn;
+        elements.accountMember.title = signedIn
+          ? `My Account · ${profile?.full_name || currentUser?.email || ''}`.trim()
+          : '';
+      }
+      const source = profileImageSource();
+      [elements.accountAvatar, elements.dashboardAvatar].forEach((image) => {
+        if (!image || image.getAttribute('src') === source) return;
+        image.dataset.fallback = '../assets/images/account-avatar-default.svg';
+        image.setAttribute('src', source);
+      });
+    }
+
     function renderAccount() {
       if (!elements.accountForms || !elements.customerDashboard) return;
       const signedIn = Boolean(currentUser);
       elements.accountForms.hidden = signedIn;
+      if (!signedIn) setAuthMode(authMode);
       elements.customerDashboard.hidden = !signedIn;
       if (elements.accountGateNote) elements.accountGateNote.hidden = signedIn;
       if (elements.memberStoreContent) elements.memberStoreContent.hidden = !signedIn;
       document.querySelectorAll('[data-member-link]').forEach((link) => { link.hidden = !signedIn; });
-      const menuEntryCta = $('menu-entry-cta');
-      if (menuEntryCta) {
-        menuEntryCta.href = signedIn ? '#top-offers' : '#account';
-        menuEntryCta.innerHTML = signedIn
-          ? 'View Top Offers <span aria-hidden="true">↑</span>'
-          : 'Sign in to view the menu <span aria-hidden="true">↓</span>';
-      }
-      if (elements.accountSessionLabel) elements.accountSessionLabel.textContent = signedIn ? currentUser.email : 'Not signed in';
+      renderAccountHeader(signedIn);
+      if (elements.accountSessionLabel) elements.accountSessionLabel.textContent = signedIn ? currentUser.email : 'Not logged in';
       if (elements.dashboardWelcome) elements.dashboardWelcome.textContent = `Welcome${profile?.full_name ? `, ${profile.full_name}` : ''}`;
       if (elements.dashboardEmail) elements.dashboardEmail.textContent = currentUser?.email || '';
       if (signedIn && elements.checkoutName && !elements.checkoutName.value) {
@@ -802,6 +836,7 @@
       if (elements.profileForm && profile) {
         elements.profileForm.elements.fullName.value = profile.full_name || '';
         elements.profileForm.elements.phone.value = profile.phone || '';
+        elements.profileForm.elements.avatarUrl.value = profile.avatar_url || '';
       }
       updateAdminLink();
       if (signedIn) loadDashboard();
@@ -813,11 +848,9 @@
       try {
         const health = await loadShopHealth();
         if (health.supabaseProjects?.[shop] === false) {
-          const missing = health.supabaseMissingSettings?.[shop] || [];
-          const missingNames = missing.length ? ` Missing settings: ${missing.join(', ')}.` : '';
           setMessage(
             elements.accountMessage,
-            `${setup.shopName || shop} accounts are unavailable until its Supabase connection is configured. ${supabaseSetupSummary()}${missingNames}`,
+            `Accounts for ${setup.shopName || shop} are not available yet. They open once the shop's account service is connected.`,
             'info',
           );
           return;
@@ -835,7 +868,7 @@
         if (error.status === 401) {
           setMessage(elements.accountMessage, '', '');
         } else {
-          setMessage(elements.accountMessage, 'Account services need the Express server and Supabase Auth configuration before sign-in or order history can work.', 'info');
+          setMessage(elements.accountMessage, 'Accounts are not available yet. Please check back soon.', 'info');
         }
       } finally {
         sessionLoaded = true;
@@ -875,11 +908,12 @@
         });
         form.reset();
         await loadAccount();
-        setMessage(elements.accountMessage, 'You are signed in. Your account and order history are scoped to this shop.', 'success');
+        setMessage(elements.accountMessage, 'You are logged in. Your account and order history belong to this shop.', 'success');
+        elements.customerDashboard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } catch (error) {
-        setMessage(elements.loginMessage, error.message || 'Sign-in could not be completed.', 'error');
+        setMessage(elements.loginMessage, error.message || 'Log-in could not be completed.', 'error');
       } finally {
-        setButtonBusy(button, false, '', 'Sign in');
+        setButtonBusy(button, false, '', 'Log In');
       }
     }
 
@@ -903,13 +937,14 @@
         if (result.authenticated) {
           await loadAccount();
           setMessage(elements.accountMessage, result.message || 'Your account is ready.', 'success');
+          elements.customerDashboard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
-          setMessage(elements.registerMessage, result.message || 'Check your email to confirm your account, then sign in.', 'success');
+          setMessage(elements.registerMessage, result.message || 'Check your email to confirm your account, then log in.', 'success');
         }
       } catch (error) {
         setMessage(elements.registerMessage, error.message || 'Account registration could not be completed.', 'error');
       } finally {
-        setButtonBusy(button, false, '', 'Create account');
+        setButtonBusy(button, false, '', 'Create Account');
       }
     }
 
@@ -923,9 +958,14 @@
       try {
         const result = await api.requestJson(authEndpoint('/profile'), {
           method: 'PATCH',
-          body: { fullName: formData.get('fullName'), phone: formData.get('phone') || '' },
+          body: {
+            fullName: formData.get('fullName'),
+            phone: formData.get('phone') || '',
+            avatarUrl: formData.get('avatarUrl') || '',
+          },
         });
         profile = result.profile || profile;
+        renderAccountHeader(Boolean(currentUser));
         if (elements.dashboardWelcome) elements.dashboardWelcome.textContent = `Welcome, ${profile?.full_name || currentUser?.email || ''}`;
         setMessage(elements.profileMessage, result.message || 'Account information updated.', 'success');
       } catch (error) {
@@ -936,17 +976,17 @@
     }
 
     async function handleLogout() {
-      setButtonBusy(elements.logoutButton, true, 'Signing out…');
+      setButtonBusy(elements.logoutButton, true, 'Logging out…');
       try {
         await api.requestJson(authEndpoint('/logout'), { method: 'POST', body: {} });
       } catch (error) {
-        setMessage(elements.accountMessage, error.message || 'Sign-out could not be completed.', 'error');
+        setMessage(elements.accountMessage, error.message || 'Log-out could not be completed.', 'error');
       } finally {
         currentUser = null;
         profile = null;
         staffMemberships = [];
         renderAccount();
-        setButtonBusy(elements.logoutButton, false, '', 'Sign out');
+        setButtonBusy(elements.logoutButton, false, '', 'Log Out');
         updateCheckoutAvailability();
       }
     }
@@ -972,7 +1012,7 @@
       const explanatoryText = elements.paymentOptions?.querySelector('.muted');
       if (explanatoryText) {
         if (!hasConnectedConfiguration && methods.length) {
-          explanatoryText.textContent = 'Preview choices only. Connect the shop and add verified payment instructions before accepting orders.';
+          explanatoryText.textContent = 'Payment is arranged directly with the shop after your order.';
           explanatoryText.hidden = false;
         } else if (hasConnectedConfiguration && methods.length) {
           explanatoryText.hidden = true;
@@ -1015,37 +1055,31 @@
       updateCheckoutAvailability();
     }
 
-    function supabaseSetupSummary() {
-      const shopName = setup.shopName || shop;
-      const seedFile = shop === 'digicha' ? 'seed-digicha.sql' : 'seed-mochajaki.sql';
-      return `Configure ${shopName} in backend/.env with the shared SUPABASE_* variables or its shop-specific variables, then run database/schema.sql and the matching ${seedFile} seed in the selected project.`;
-    }
-
     function updateCheckoutNotice() {
       if (!elements.checkoutSetupNotice) return;
       let message;
       let kind = '';
       if (!sourceConnected && elements.memberStoreContent && !currentUser) {
-        message = `Create an account or sign in to see the Mochajaki menu. ${supabaseSetupSummary()} No payment is collected in this preview.`;
+        message = 'Log in to see the Mochajaki menu. No payment is collected here.';
       } else if (!sourceConnected) {
-        const visibility = elements.memberStoreContent ? 'shown after sign-in' : 'visible';
-        message = `Preview only: local sample listings are ${visibility}. ${supabaseSetupSummary()} Accounts and order submission remain unavailable until setup. No payment is collected in this preview.`;
+        const visibility = elements.memberStoreContent ? 'shown after sign-in' : 'on this page';
+        message = `Sample listings are ${visibility} while the shop is being set up. Accounts and order submission are not available yet, and no payment is collected.`;
       } else if (!checkoutConfig) {
-        message = 'The catalog loaded, but checkout settings could not be loaded. Confirm the shop fulfillment and payment configuration.';
+        message = 'Checkout settings could not be loaded. Refresh the page and try again.';
         kind = 'error';
       } else if (shopInfo.is_demo && checkoutConfig.sample_orders_enabled) {
-        message = 'Development mode: orders are test orders and remain unpaid. GCash, Maya, and Other are manual payment choices; this site does not collect or verify payment.';
+        message = 'Test orders only: orders placed here are samples and no payment is collected.';
       } else if (shopInfo.is_demo) {
-        message = 'This shop is still in demo mode. Confirm prices, fulfillment details, and payment instructions before accepting live orders.';
+        message = 'This shop is still being set up, so orders cannot be placed yet.';
         kind = 'error';
       } else if (!checkoutConfig.shop?.fulfillment_options?.length || !checkoutConfig.payment_methods?.length) {
-        message = 'Ordering is not available until the shop owner enables at least one fulfillment option and one payment method.';
+        message = 'Ordering is not available yet.';
         kind = 'error';
       } else if (checkoutConfig.stripe_setup_needed) {
-        message = 'Stripe credentials are incomplete. Only the explicitly configured non-Stripe payment methods can be used.';
+        message = 'Card payments are unavailable right now. The other payment options still work.';
         kind = 'info';
       } else {
-        message = 'Connected catalog. The server rechecks availability, selected options, promotions, and totals before saving each order.';
+        message = 'Availability, selected options, discounts, and totals are confirmed when your order is placed.';
       }
       elements.checkoutSetupNotice.textContent = message;
       elements.checkoutSetupNotice.className = `checkout-notice${kind ? ` is-${kind}` : ''}`;
@@ -1056,16 +1090,16 @@
       if (elements.modeLabel) {
         elements.modeLabel.textContent = accountRequired
           ? 'Account required'
-          : (!sourceConnected ? 'Preview · offline' : (shopInfo.is_demo ? 'Supabase demo catalog' : 'Connected catalog'));
+          : (sourceConnected && !shopInfo.is_demo ? 'Live catalog' : 'Sample catalog');
       }
       if (elements.backendStatus) {
         elements.backendStatus.textContent = accountRequired
-          ? 'Sign in or create a Mochajaki account to access Top Offers and the menu.'
+          ? 'Log in to your Mochajaki account to see Top Offers and the menu.'
           : (!sourceConnected
-            ? `Preview only: local sample listings are shown. ${supabaseSetupSummary()}`
+            ? 'Sample listings are shown while the shop is being set up.'
             : (shopInfo.is_demo
-              ? 'Development shop connected. Test orders remain unpaid; payment methods are selection only and are not verified here.'
-              : 'Connected to the shop catalog. Product availability and totals are confirmed again by the server at checkout.'));
+              ? 'Test catalog connected. Orders placed here are samples and no payment is collected.'
+              : 'Availability and totals are confirmed again when your order is placed.'));
       }
       updateCheckoutNotice();
     }
@@ -1193,7 +1227,7 @@
         (selectedPayment.type !== 'online' || checkoutConfig?.stripe_ready),
       );
       elements.placeOrder.disabled = !ready;
-      if (!userReady) elements.placeOrder.textContent = 'Sign in to place order';
+      if (!userReady) elements.placeOrder.textContent = 'Log in to place order';
       else if (!cart.length) elements.placeOrder.textContent = 'Your cart is empty';
       else if (!sourceConnected) elements.placeOrder.textContent = 'Connect shop backend to order';
       else if (containsSamples && !samplesAllowed) elements.placeOrder.textContent = 'Replace demo items before ordering';
@@ -1379,7 +1413,7 @@
         return;
       }
       if (!sourceConnected) {
-        setMessage(elements.promoMessage, 'Promotion codes are verified by the connected shop server. This offline preview cannot validate or apply one.', 'error');
+        setMessage(elements.promoMessage, 'Promotion codes cannot be checked right now. They are confirmed with your order.', 'error');
         return;
       }
       appliedPromoCode = normalizedCode;
@@ -1392,12 +1426,12 @@
     async function handleCheckout(event) {
       event.preventDefault();
       if (!currentUser) {
-        setMessage(elements.checkoutMessage, 'Sign in or create an account before placing an order.', 'error');
+        setMessage(elements.checkoutMessage, 'Log in before placing an order.', 'error');
         if ($('account')) $('account').scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
       if (!sourceConnected || !checkoutConfig) {
-        setMessage(elements.checkoutMessage, 'Ordering is disabled in this preview. Connect Supabase and configure the shop first.', 'error');
+        setMessage(elements.checkoutMessage, 'Orders cannot be placed yet — this shop is still being set up.', 'error');
         return;
       }
       if (!cartHasValidProducts()) {
@@ -1476,7 +1510,7 @@
       if (state !== 'return') return;
       const sessionId = parameters.get('session_id');
       if (!sessionId || !currentUser) {
-        setMessage(elements.accountMessage, 'Sign in to verify the payment status and see the order in your account.', 'info');
+        setMessage(elements.accountMessage, 'Log in to verify the payment status and see the order in your account.', 'info');
         return;
       }
 
@@ -1633,6 +1667,22 @@
           const target = $(button.dataset.scrollTo);
           target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+      });
+
+      document.querySelectorAll('[data-auth-mode]').forEach((link) => {
+        link.addEventListener('click', () => {
+          setAuthMode(link.dataset.authMode);
+        });
+      });
+
+      elements.accountMember?.addEventListener('click', (event) => {
+        event.preventDefault();
+        if (currentUser) {
+          elements.customerDashboard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          $('account')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        closeMobileMenu();
       });
 
       const menu = document.querySelector('.store-nav');

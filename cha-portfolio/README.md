@@ -10,8 +10,8 @@ The three front ends are organized into separate `portfolio/`, `digicha-shop/`, 
 - **About Me** — brief introduction, seven years in Mabini, the supplied interests and games, inactive social-profile placeholders, a resume section, and the requested nine technology icons. Resume material stays here; there is no resume navigation tab or download button.
 - **Projects** — scrollable System Development, Graphics (Publication Materials and Certificates), and Writing galleries. Empty image slots, hover/tap descriptions, and an accessible image-preview dialog are included.
 - **Discover Mabini** — short municipality history, resorts and places to research, the requested café names, map searches, and a reminder to check current local information. The guide does not claim personal visits.
-- **Shop directory** — separate “Visit” links open the corresponding storefront in a new tab.
-- **DigiCha** and **Mochajaki** — distinct storefronts with catalog search/filtering, product options, carts, server quotes, suggestions, customer dashboards, and order tracking. DigiCha can show configured promotions; Mochajaki presents sample food-combo bundles and has no promo-code entry. Both storefronts can share the same Supabase project while remaining isolated by shop slug, or use separate projects when required.
+- **Shop directory** — introduces both shops and opens each storefront in a new tab through its Visit link.
+- **DigiCha** and **Mochajaki** — distinct storefronts with catalog search/filtering, product options, carts, server quotes, suggestions, customer dashboards, and order tracking. DigiCha can show configured promotions; Mochajaki presents sample food-combo bundles and has no promo-code entry. The header of each storefront keeps one account entry point on the right: **Log In | Create Account** while signed out, and the account image with **My Account** once signed in, which opens the customer profile dashboard (`Account & orders`) for that shop. Both storefronts can share the same Supabase project while remaining isolated by shop slug, or use separate projects when required.
 - **Admin** — shop-specific staff-only catalog, order-status, promotion, and settings screens. Admin sign-ins and staff permissions are checked against the selected shop’s Supabase project.
 - **Express API / SQL** — isolated per-shop database and Auth clients, per-shop HttpOnly session cookies, server-calculated PHP totals, order snapshots, optional Stripe Checkout, shared schema, and separate per-shop starter seeds.
 
@@ -50,6 +50,7 @@ Requirements: Node.js 18 or newer, npm, and either the shared Supabase project c
 4. In the Supabase project's SQL Editor:
    - For a new project, run `database/schema.sql`.
    - If this is an existing project created with the older schema in this package, back up the database, run `database/migrations/001_upgrade_existing_shop_schema.sql`, then run `database/schema.sql`.
+   - On a database created before profile photos were added, also run `database/migrations/002_add_profile_avatar.sql` (it only adds the `profiles.avatar_url` column and is safe to re-run).
    - For the shared project, run `database/seed.sql`.
    - For separate projects, run `database/seed-digicha.sql` in DigiCha and `database/seed-mochajaki.sql` in Mochajaki.
 5. If using separate projects, repeat step 4 in the Mochajaki Supabase project. Do not run `seed.sql` in that setup.
@@ -63,7 +64,7 @@ Requirements: Node.js 18 or newer, npm, and either the shared Supabase project c
 
 **For the shared project, run `database/seed.sql` once. For a two-project setup, do not run `database/seed.sql`; use the matching per-shop seed in each project.** If a combined seed was already applied to an existing project, back up and review its data before removing anything.
 
-For Node watch mode, use `npm run dev`. Run `npm run check` in `backend/` to syntax-check the server, routes, and browser JavaScript; `npm test` runs local tests for per-shop Supabase configuration and session isolation.
+For Node watch mode, use `npm run dev`. Run `npm run check` in `backend/` to syntax-check the server, routes, and browser JavaScript; `npm test` runs local tests for per-shop Supabase configuration and session isolation, then loads both storefront pages in jsdom to verify the account header (Log In | Create Account while signed out, the account image with My Account and the profile dashboard when signed in, and the removal of owner-directed copy). The storefront checks skip themselves when `jsdom` is not installed.
 
 ## Supabase and authentication setup
 

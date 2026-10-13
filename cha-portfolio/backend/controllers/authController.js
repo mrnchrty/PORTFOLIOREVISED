@@ -34,6 +34,29 @@ function normalizeFullName(value) {
   return value.trim();
 }
 
+const AVATAR_URL_MAX_LENGTH = 500;
+
+function normalizeAvatarUrl(value) {
+  if (value === undefined || value === null) return '';
+  if (typeof value !== 'string') throw validationError('Enter a valid photo link.');
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (trimmed.length > AVATAR_URL_MAX_LENGTH) {
+    throw validationError(`The photo link must be ${AVATAR_URL_MAX_LENGTH} characters or fewer.`);
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    throw validationError('Enter a full photo link that starts with https://.');
+  }
+  if (parsed.protocol !== 'https:' || parsed.username || parsed.password) {
+    throw validationError('Use a secure https:// link for the profile photo.');
+  }
+  return parsed.href;
+}
+
 function normalizePhone(value) {
   if (typeof value !== 'string' || value.length > 40) {
     throw validationError('Contact number must be 40 characters or fewer.');
@@ -156,7 +179,7 @@ async function getMe(request, response, next) {
     const db = getSupabase(slug);
     const { data: profile, error: profileError } = await db
       .from('profiles')
-      .select('id, full_name, phone, created_at, updated_at')
+      .select('id, full_name, phone, avatar_url, created_at, updated_at')
       .eq('id', request.user.id)
       .maybeSingle();
 
@@ -175,6 +198,7 @@ async function getMe(request, response, next) {
         id: request.user.id,
         full_name: request.user.user_metadata?.full_name || '',
         phone: '',
+        avatar_url: '',
       },
       staff_memberships: memberships,
     });
@@ -187,14 +211,15 @@ async function updateProfile(request, response, next) {
   try {
     const fullName = normalizeFullName(request.body?.fullName);
     const phone = normalizePhone(request.body?.phone ?? '');
+    const avatarUrl = normalizeAvatarUrl(request.body?.avatarUrl ?? '');
     const db = getSupabase(shopSlug(request));
     const { data, error } = await db
       .from('profiles')
       .upsert(
-        { id: request.user.id, full_name: fullName, phone },
+        { id: request.user.id, full_name: fullName, phone, avatar_url: avatarUrl },
         { onConflict: 'id' },
       )
-      .select('id, full_name, phone, created_at, updated_at')
+      .select('id, full_name, phone, avatar_url, created_at, updated_at')
       .single();
 
     if (error) throw error;

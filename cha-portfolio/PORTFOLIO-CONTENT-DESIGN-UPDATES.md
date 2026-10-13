@@ -1,5 +1,14 @@
 # Portfolio Content and Design Updates
 
+## Shop header and storefront copy (13 October 2026)
+- Each storefront header now carries a single account entry point at the top right: **Log In | Create Account**, separated by a divider.
+- Once a customer is signed in, that same spot shows the account image with **My Account**, and opening it shows the customer profile dashboard (portrait, name, contact number, orders, and shop deals).
+- The account section shows one form at a time; the header links and the in-form switch links choose between **Log In** and **Create Account**.
+- Replaced the storefront descriptions with customer-facing copy and removed owner-directed setup/instruction notes that were visible on the public pages (for example “Confirm each combo before accepting real orders”, “Connect Supabase and configure the shop first”, and the project menu-reference wording). Configuration facts that visitors still need — sample listings, no payment collected, order submission unavailable — remain, in plain language.
+- Removed the “Browse the shop” hero button and the other hero sign-in buttons; the header is now the single sign-in path.
+- Profile images use `assets/images/account-avatar-default.svg` until a real photo is supplied.
+- The profile form now includes **Profile photo link**: paste an `https://` image link and it becomes the picture in the header chip and on the dashboard. The link is stored on `profiles.avatar_url` (see `database/migrations/002_add_profile_avatar.sql`); there is no file upload, so images stay wherever they are hosted.
+
 ## Applied in this revision
 - Reworked About Me with a clear personal narrative and a five-image gallery.
 - Each About Me image is replaceable by editing the `src` attribute in `portfolio/about/index.html`.
